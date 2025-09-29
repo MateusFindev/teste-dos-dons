@@ -55,10 +55,54 @@ Este teste foi gerado automaticamente pelo sistema Teste dos Dons.
   return texto
 }
 
+const montarBlocosEmail = (resultados) => {
+  const arr = Array.isArray(resultados) ? resultados : []
+  const top3 = arr.slice(0, 3)
+
+  const safe = (v) => (v ?? '')
+  const t = (i) => top3[i] || {}
+
+  const top = {
+    top1_nome: safe(t(0).nome),
+    top1_pontos: safe(t(0).pontuacao ?? 0),
+    top1_percentual: safe(t(0).percentual ?? 0),
+
+    top2_nome: safe(t(1).nome),
+    top2_pontos: safe(t(1).pontuacao ?? 0),
+    top2_percentual: safe(t(1).percentual ?? 0),
+
+    top3_nome: safe(t(2).nome),
+    top3_pontos: safe(t(2).pontuacao ?? 0),
+    top3_percentual: safe(t(2).percentual ?? 0),
+  }
+
+  const linhas = arr
+    .map((dom, i) => {
+      const pct = Math.max(0, Math.min(100, Number(dom.percentual || 0)))
+      return `
+<tr>
+  <td style="font:12px Arial,Helvetica,sans-serif;color:#333;padding:8px;border-bottom:1px solid #f2f2f2;">${i + 1}</td>
+  <td style="font:600 13px Arial,Helvetica,sans-serif;color:#111;padding:8px;border-bottom:1px solid #f2f2f2;">${dom.nome}</td>
+  <td style="padding:8px;border-bottom:1px solid #f2f2f2;">
+    <div style="width:160px;max-width:100%;height:8px;background:#eee;border-radius:6px;overflow:hidden;">
+      <div style="height:8px;width:${pct}%;background:#6b5cf6;"></div>
+    </div>
+  </td>
+  <td style="font:600 12px Arial,Helvetica,sans-serif;color:#2b2b2b;padding:8px;border-bottom:1px solid #f2f2f2;text-align:right;">
+    ${dom.pontuacao} pts &nbsp;|&nbsp; ${pct}%
+  </td>
+</tr>`
+    })
+    .join('')
+
+  // Este objeto é o que vamos "espalhar" com ...blocos
+  return { ...top, tabela_resultados_html: linhas }
+}
+
 const buildTemplateParams = (formData, resultados, opts = {}) => {
   const textoResultados = formatarResultadosParaEmail(formData, resultados)
   const data  = new Date()
-  const blocos = montarBlocosEmail(resultados)
+  const blocos = montarBlocosEmail(resultados) // <- gera os campos do email estilizado
 
   return {
     from_name: opts.from_name ?? `${formData.igreja} - Sistema Teste dos Dons`,
@@ -76,7 +120,10 @@ const buildTemplateParams = (formData, resultados, opts = {}) => {
 
     to_email: opts.to_email,
     to_name:  opts.to_name,
-    subject:  opts.subject ?? `Resultado do Teste dos Dons - ${formData.nome}`
+    subject:  opts.subject ?? `Resultado do Teste dos Dons - ${formData.nome}`,
+
+    // Blocos para o HTML do template (top1/2/3 + tabela)
+    ...blocos
   }
 }
 
@@ -175,45 +222,3 @@ export const validarConfiguracaoEmail = () => {
   }
 }
 
-const montarBlocosEmail = (resultados) => {
-  const arr = Array.isArray(resultados) ? resultados : []
-  const top3 = arr.slice(0, 3)
-
-  const safe = (v) => (v ?? '')
-  const t = (i) => top3[i] || {}
-
-  const top = {
-    top1_nome: safe(t(0).nome),
-    top1_pontos: safe(t(0).pontuacao ?? 0),
-    top1_percentual: safe(t(0).percentual ?? 0),
-
-    top2_nome: safe(t(1).nome),
-    top2_pontos: safe(t(1).pontuacao ?? 0),
-    top2_percentual: safe(t(1).percentual ?? 0),
-
-    top3_nome: safe(t(2).nome),
-    top3_pontos: safe(t(2).pontuacao ?? 0),
-    top3_percentual: safe(t(2).percentual ?? 0),
-  }
-
-  const linhas = arr
-    .map((dom, i) => {
-      const pct = Math.max(0, Math.min(100, Number(dom.percentual || 0)))
-      return `
-<tr>
-  <td style="font:12px Arial,Helvetica,sans-serif;color:#333;padding:8px;border-bottom:1px solid #f2f2f2;">${i + 1}</td>
-  <td style="font:600 13px Arial,Helvetica,sans-serif;color:#111;padding:8px;border-bottom:1px solid #f2f2f2;">${dom.nome}</td>
-  <td style="padding:8px;border-bottom:1px solid #f2f2f2;">
-    <div style="width:160px;max-width:100%;height:8px;background:#eee;border-radius:6px;overflow:hidden;">
-      <div style="height:8px;width:${pct}%;background:#6b5cf6;"></div>
-    </div>
-  </td>
-  <td style="font:600 12px Arial,Helvetica,sans-serif;color:#2b2b2b;padding:8px;border-bottom:1px solid #f2f2f2;text-align:right;">
-    ${dom.pontuacao} pts &nbsp;|&nbsp; ${pct}%
-  </td>
-</tr>`
-    })
-    .join('')
-
-  return { ...top, tabela_resultados_html: linhas }
-}
