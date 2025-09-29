@@ -30,6 +30,8 @@ function App() {
     usuario: null // 'success', 'error', null
   })
   const resultadosRef = useRef(null)
+  const IGREJAS_COM_AVISO = new Set(['OBPC Cafelândia'])
+
 
   const totalSteps = 9 // início + 7 testes + resultados
   const progressPercentage = (currentStep / totalSteps) * 100
@@ -288,16 +290,19 @@ function App() {
           </div>
         </div>
 
-        <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
-          <h3 className="font-semibold text-green-900 mb-2 flex items-center gap-2">
-            <Mail className="h-4 w-4" />
-            Envio Automático de Resultados
-          </h3>
-          <p className="text-green-800 text-sm">
-            Os resultados serão enviados automaticamente para a secretaria da sua igreja 
-            e para seu email (se informado) ao final do teste.
-          </p>
-        </div>
+        {IGREJAS_COM_AVISO.has(formData.igreja) && (
+          <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+            <h3 className="font-semibold text-green-900 mb-2 flex items-center gap-2">
+              <Mail className="h-4 w-4" />
+              Envio Automático de Resultados
+            </h3>
+            <p className="text-green-800 text-sm">
+              Os resultados serão enviados automaticamente para a secretaria da sua igreja 
+              e para seu email (se informado) ao final do teste.
+            </p>
+          </div>
+        )}
+
         
         <Button 
           onClick={handleNext}
