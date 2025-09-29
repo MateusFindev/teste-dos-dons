@@ -7,7 +7,7 @@ const EMAILJS_CONFIG = {
 
 const EMAIL_IGREJAS = {
   'OBPC Cascavel - São Cristóvão': 'administrativo@obpccascavel.com.br',
-  'OBPC Cafelândia': 'administrativo@obpccafelandia.com.br'
+  'OBPC Cafelândia': 'ti@obpccafelandia.org'
 }
 
 // ===== helpers (iguais aos seus) =====
