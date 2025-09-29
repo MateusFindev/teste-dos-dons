@@ -1,0 +1,199 @@
+{
+  "titulo": "O TESTE DOS DONS",
+  "subtitulo": "(Adaptado do livro homônimo de Christian A. Schwarz, 1999)",
+  "instrucoes": "PARA CADA AFIRMAÇÃO, MARQUE O QUANTO VOCÊ CONCORDA OU DISCORDA",
+  "pontuacao": [40, 30, 20, 10, 0],
+  "opcoes_resposta": ["Concordo Plenamente", "Concordo", "Neutro", "Discordo", "Discordo Plenamente"],
+  "testes": [
+    {
+      "id": 1,
+      "titulo": "TESTE 1",
+      "perguntas": [
+        "Sinto-me realizado(a) em desenvolver planos detalhados para alcançar objetivos definidos.",
+        "Sinto-me realizado(a) em falar de Jesus e de meu relacionamento com ele para não cristãos.",
+        "Sinto-me realizado(a) em encorajar outras pessoas.",
+        "Sinto-me realizado(a) em colocar, de forma generosa, o meu dinheiro e as minhas posses à disposição do reino de Deus.",
+        "Sinto-me realizado(a) em colaborar na elaboração de materiais que tornem simples e interessante o aprendizado das pessoas.",
+        "Sinto-me realizado(a) em trabalhar nos bastidores, em surdina, para apoiar as pessoas que estão realizando um ministério público.",
+        "Sinto-me realizado(a) em receber visitas mesmo quando chegam de surpresa, preparar comida e oferecer uma boa acolhida para eles.",
+        "Sinto-me realizado(a) em orar por uma hora ou mais.",
+        "Sinto-me realizado(a) em liderar pessoas de tal forma que se engajem em um projeto que conduza a um objetivo comum.",
+        "Sinto-me realizado(a) em preocupar-me com pessoas que estão à margem da sociedade.",
+        "Sinto-me realizado(a) em preocupar-me com o bem espiritual de outros cristãos e acompanhá-los por um tempo longo.",
+        "Sinto-me realizado(a) em servir de canal por meio do qual Deus dá orientações claras em uma determinada situação.",
+        "Sinto-me realizado(a) em aceitar serviços pequenos e aparentemente insignificantes na igreja."
+      ]
+    },
+    {
+      "id": 2,
+      "titulo": "TESTE 2",
+      "perguntas": [
+        "Tenho vontade de me envolver em planejar projetos para a igreja, organizá-los e achar as pessoas para a sua implantação.",
+        "Tenho vontade de me envolver em conversar sobre a fé em Jesus Cristo com outras pessoas.",
+        "Tenho vontade de me envolver em acompanhar de perto pessoas nas suas necessidades.",
+        "Tenho vontade de me envolver em entrar em contato com as pessoas e projetos que dependam da minha ajuda financeira.",
+        "Tenho vontade de me envolver em gastar tempo ensinando conhecimento e aptidões a outras pessoas.",
+        "Tenho vontade de me envolver em apoiar outros cristãos colocando os meus dons a serviço de seus ministérios.",
+        "Tenho vontade de me envolver em oferecer a pessoas estranhas um ambiente agradável em minha casa.",
+        "Tenho vontade de me envolver em dedicar muito tempo à oração.",
+        "Tenho vontade de me envolver em ser chamado para tarefas de liderança.",
+        "Tenho vontade de me envolver em ter contato com pessoas que foram negligenciadas ou abandonadas pela sociedade.",
+        "Tenho vontade de me envolver em acompanhar cristãos para ajudá-los no seu crescimento espiritual.",
+        "Tenho vontade de me envolver em esclarecer a outros cristãos qual é a vontade de Deus em uma determinada situação.",
+        "Tenho vontade de me envolver em ser chamado(a) quando há necessidade de serem realizadas tarefas práticas na igreja."
+      ]
+    },
+    {
+      "id": 3,
+      "titulo": "TESTE 3",
+      "perguntas": [
+        "Considero-me uma pessoa que consegue organizar bem projetos e conduzi-los ao sucesso.",
+        "Considero-me uma pessoa que consegue falar de forma natural sobre Jesus Cristo com não cristãos.",
+        "Considero-me uma pessoa que consegue motivar outras pessoas a não desistirem.",
+        "Considero-me uma pessoa que consegue dar generosamente do meu dinheiro para a obra de Deus.",
+        "Considero-me uma pessoa que consegue explicar questões complicadas de forma simples e compreensível.",
+        "Considero-me uma pessoa que consegue apoiar outros cristãos de forma prática em seus ministérios.",
+        "Considero-me uma pessoa que consegue fazer com que pessoas se sintam bem-vindas em minha casa.",
+        "Considero-me uma pessoa que consegue orar com perseverança por determinadas pessoas e situações.",
+        "Considero-me uma pessoa que consegue motivar outras pessoas a trabalharem juntas por um objetivo comum.",
+        "Considero-me uma pessoa que consegue ter compaixão especial por pessoas marginalizadas.",
+        "Considero-me uma pessoa que consegue ajudar outros cristãos em seu crescimento espiritual.",
+        "Considero-me uma pessoa que consegue reconhecer qual é a vontade de Deus em situações específicas.",
+        "Considero-me uma pessoa que consegue realizar tarefas práticas na igreja com alegria."
+      ]
+    },
+    {
+      "id": 4,
+      "titulo": "TESTE 4",
+      "perguntas": [
+        "Outras pessoas já me disseram que tenho o dom de organizar e administrar projetos.",
+        "Outras pessoas já me disseram que tenho o dom de evangelizar não cristãos.",
+        "Outras pessoas já me disseram que tenho o dom de encorajar e motivar pessoas.",
+        "Outras pessoas já me disseram que tenho o dom de contribuir generosamente para a obra de Deus.",
+        "Outras pessoas já me disseram que tenho o dom de ensinar e explicar verdades bíblicas.",
+        "Outras pessoas já me disseram que tenho o dom de servir e apoiar outros ministérios.",
+        "Outras pessoas já me disseram que tenho o dom de hospitalidade e acolhimento.",
+        "Outras pessoas já me disseram que tenho o dom de oração e intercessão.",
+        "Outras pessoas já me disseram que tenho o dom de liderança.",
+        "Outras pessoas já me disseram que tenho o dom de misericórdia com necessitados.",
+        "Outras pessoas já me disseram que tenho o dom de pastorear e cuidar de pessoas.",
+        "Outras pessoas já me disseram que tenho o dom de profecia e orientação espiritual.",
+        "Outras pessoas já me disseram que tenho o dom de servir de forma prática."
+      ]
+    },
+    {
+      "id": 5,
+      "titulo": "TESTE 5",
+      "perguntas": [
+        "Quando vejo projetos mal organizados, sinto necessidade de reorganizá-los.",
+        "Quando vejo não cristãos, sinto necessidade de compartilhar o evangelho com eles.",
+        "Quando vejo pessoas desanimadas, sinto necessidade de encorajá-las.",
+        "Quando vejo necessidades financeiras na obra de Deus, sinto necessidade de contribuir.",
+        "Quando vejo pessoas com dúvidas bíblicas, sinto necessidade de ensiná-las.",
+        "Quando vejo líderes sobrecarregados, sinto necessidade de apoiá-los praticamente.",
+        "Quando vejo pessoas precisando de acolhimento, sinto necessidade de recebê-las em casa.",
+        "Quando vejo situações difíceis, sinto necessidade de orar intensamente por elas.",
+        "Quando vejo grupos sem direção, sinto necessidade de liderá-los.",
+        "Quando vejo pessoas marginalizadas, sinto necessidade de ajudá-las.",
+        "Quando vejo cristãos com problemas espirituais, sinto necessidade de pastoreá-los.",
+        "Quando vejo situações confusas, sinto necessidade de buscar a direção de Deus.",
+        "Quando vejo tarefas práticas na igreja, sinto necessidade de realizá-las."
+      ]
+    },
+    {
+      "id": 6,
+      "titulo": "TESTE 6",
+      "perguntas": [
+        "Tenho facilidade para planejar e organizar eventos e projetos.",
+        "Tenho facilidade para conversar sobre Jesus com pessoas não cristãs.",
+        "Tenho facilidade para animar e motivar pessoas desanimadas.",
+        "Tenho facilidade para contribuir financeiramente de forma generosa.",
+        "Tenho facilidade para ensinar e explicar conceitos bíblicos.",
+        "Tenho facilidade para servir e apoiar outros em seus ministérios.",
+        "Tenho facilidade para receber e hospedar pessoas em minha casa.",
+        "Tenho facilidade para manter uma vida de oração constante.",
+        "Tenho facilidade para liderar grupos e projetos.",
+        "Tenho facilidade para me relacionar com pessoas necessitadas.",
+        "Tenho facilidade para aconselhar e cuidar espiritualmente de outros.",
+        "Tenho facilidade para discernir a vontade de Deus em situações específicas.",
+        "Tenho facilidade para realizar trabalhos práticos na igreja."
+      ]
+    },
+    {
+      "id": 7,
+      "titulo": "TESTE 7",
+      "observacao": "Esta seção deve ser respondida por alguém que te conhece bem.",
+      "perguntas": [
+        "Esta pessoa demonstra habilidade para organizar e administrar projetos eficientemente.",
+        "Esta pessoa demonstra habilidade para evangelizar e compartilhar sua fé naturalmente.",
+        "Esta pessoa demonstra habilidade para encorajar e motivar outros.",
+        "Esta pessoa demonstra habilidade para contribuir generosamente para a obra de Deus.",
+        "Esta pessoa demonstra habilidade para ensinar e explicar verdades bíblicas claramente.",
+        "Esta pessoa demonstra habilidade para servir e apoiar outros ministérios.",
+        "Esta pessoa demonstra habilidade para ser hospitaleira e acolhedora.",
+        "Esta pessoa demonstra habilidade para orar com perseverança e dedicação.",
+        "Esta pessoa demonstra habilidade para liderar e influenciar positivamente outros.",
+        "Esta pessoa demonstra habilidade para mostrar misericórdia aos necessitados.",
+        "Esta pessoa demonstra habilidade para pastorear e cuidar espiritualmente de outros.",
+        "Esta pessoa demonstra habilidade para discernir e comunicar a vontade de Deus.",
+        "Esta pessoa demonstra habilidade para servir de forma prática e alegre."
+      ]
+    }
+  ],
+  "gabarito": {
+    "dons": [
+      {
+        "nome": "Administração",
+        "perguntas": [1, 14, 27, 40, 53, 66, 79]
+      },
+      {
+        "nome": "Evangelismo",
+        "perguntas": [2, 15, 28, 41, 54, 67, 80]
+      },
+      {
+        "nome": "Encorajamento",
+        "perguntas": [3, 16, 29, 42, 55, 68, 81]
+      },
+      {
+        "nome": "Contribuição",
+        "perguntas": [4, 17, 30, 43, 56, 69, 82]
+      },
+      {
+        "nome": "Ensino",
+        "perguntas": [5, 18, 31, 44, 57, 70, 83]
+      },
+      {
+        "nome": "Serviço",
+        "perguntas": [6, 19, 32, 45, 58, 71, 84]
+      },
+      {
+        "nome": "Hospitalidade",
+        "perguntas": [7, 20, 33, 46, 59, 72, 85]
+      },
+      {
+        "nome": "Oração",
+        "perguntas": [8, 21, 34, 47, 60, 73, 86]
+      },
+      {
+        "nome": "Liderança",
+        "perguntas": [9, 22, 35, 48, 61, 74, 87]
+      },
+      {
+        "nome": "Misericórdia",
+        "perguntas": [10, 23, 36, 49, 62, 75, 88]
+      },
+      {
+        "nome": "Pastoreio",
+        "perguntas": [11, 24, 37, 50, 63, 76, 89]
+      },
+      {
+        "nome": "Profecia",
+        "perguntas": [12, 25, 38, 51, 64, 77, 90]
+      },
+      {
+        "nome": "Serviço Prático",
+        "perguntas": [13, 26, 39, 52, 65, 78, 91]
+      }
+    ]
+  }
+}
