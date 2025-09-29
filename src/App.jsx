@@ -627,7 +627,7 @@ function App() {
           </div>
         )}
 
-        <div ref={resultadosRef} className="w-full max-w-6xl mx-auto bg-white">
+        <div ref={resultadosRef} id="print-area" className="w-full max-w-6xl mx-auto bg-white">
           <Card className="border-0 shadow-lg md:shadow-2xl">
             <CardHeader className="text-center bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-t-lg p-4 md:p-6">
               <div className="mx-auto w-16 h-16 md:w-20 md:h-20 bg-white/20 rounded-full flex items-center justify-center mb-3 md:mb-4">
@@ -751,15 +751,15 @@ function App() {
         {/* Botões de Ação */}
         <div className="flex flex-col gap-3 md:gap-4 justify-center max-w-6xl mx-auto px-4">
           <Button
-            onClick={exportarPDF}
-            disabled={isExporting}
+            onClick={() => window.print()}
             variant="outline"
             size="lg"
             className="w-full md:max-w-xs md:mx-auto"
           >
             <Download className="mr-2 h-4 md:h-5 w-4 md:w-5" />
-            {isExporting ? 'Gerando PDF...' : 'Baixar PDF'}
+            Imprimir / Salvar como PDF
           </Button>
+
 
           <Button 
             onClick={() => {
