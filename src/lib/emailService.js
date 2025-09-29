@@ -128,60 +128,60 @@ const buildTemplateParams = (formData, resultados, opts = {}) => {
 }
 
 const enviarViaApi = async (templateParams) => {
-  // const resp = await fetch('/api/emailjs/send', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify({ template_params: templateParams }) // <— aninhado
-  // })
-  // const data = await resp.json().catch(() => ({}))
-  // if (!resp.ok || !data?.ok) {
-  //   throw new Error(data?.error || `Falha no envio (${resp.status})`)
-  // }
-  // return data
+  const resp = await fetch('/api/emailjs/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ template_params: templateParams }) // <— aninhado
+  })
+  const data = await resp.json().catch(() => ({}))
+  if (!resp.ok || !data?.ok) {
+    throw new Error(data?.error || `Falha no envio (${resp.status})`)
+  }
+  return data
 }
 
 // ===== exports =====
 export const enviarEmailSecretaria = async (formData, resultados) => {
-  // try {
-  //   const emailSecretaria = EMAIL_IGREJAS[formData.igreja]
-  //   if (!emailSecretaria) throw new Error('Email da secretaria não encontrado para esta igreja')
+  try {
+    const emailSecretaria = EMAIL_IGREJAS[formData.igreja]
+    if (!emailSecretaria) throw new Error('Email da secretaria não encontrado para esta igreja')
 
-  //   const params = buildTemplateParams(formData, resultados, {
-  //     to_email: emailSecretaria,
-  //     to_name: `Secretaria ${formData.igreja}`,
-  //     from_name: 'Sistema Teste dos Dons',
-  //     subject: `Novo Teste dos Dons - ${formData.nome}`
-  //   })
+    const params = buildTemplateParams(formData, resultados, {
+      to_email: emailSecretaria,
+      to_name: `Secretaria ${formData.igreja}`,
+      from_name: 'Sistema Teste dos Dons',
+      subject: `Novo Teste dos Dons - ${formData.nome}`
+    })
 
-  //   const response = await enviarViaApi(params)
-  //   console.log('Email enviado para secretaria:', response)
-  //   return { success: true, response }
-  // } catch (error) {
-  //   console.error('Erro ao enviar email para secretaria:', error)
-  //   return { success: false, error: error?.message || String(error) }
-  // }
+    const response = await enviarViaApi(params)
+    console.log('Email enviado para secretaria:', response)
+    return { success: true, response }
+  } catch (error) {
+    console.error('Erro ao enviar email para secretaria:', error)
+    return { success: false, error: error?.message || String(error) }
+  }
 }
 
 export const enviarEmailUsuario = async (formData, resultados) => {
-  // try {
-  //   if (!formData.email || !formData.email.trim()) {
-  //     return { success: true, message: 'Email do usuário não fornecido' }
-  //   }
+  try {
+    if (!formData.email || !formData.email.trim()) {
+      return { success: true, message: 'Email do usuário não fornecido' }
+    }
 
-  //   const params = buildTemplateParams(formData, resultados, {
-  //     to_email: formData.email,
-  //     to_name: formData.nome,
-  //     from_name: `${formData.igreja} - Sistema Teste dos Dons`,
-  //     subject: `Seus Resultados do Teste dos Dons - ${formData.nome}`
-  //   })
+    const params = buildTemplateParams(formData, resultados, {
+      to_email: formData.email,
+      to_name: formData.nome,
+      from_name: `${formData.igreja} - Sistema Teste dos Dons`,
+      subject: `Seus Resultados do Teste dos Dons - ${formData.nome}`
+    })
 
-  //   const response = await enviarViaApi(params)
-  //   console.log('Email enviado para usuário:', response)
-  //   return { success: true, response }
-  // } catch (error) {
-  //   console.error('Erro ao enviar email para usuário:', error)
-  //   return { success: false, error: error?.message || String(error) }
-  // }
+    const response = await enviarViaApi(params)
+    console.log('Email enviado para usuário:', response)
+    return { success: true, response }
+  } catch (error) {
+    console.error('Erro ao enviar email para usuário:', error)
+    return { success: false, error: error?.message || String(error) }
+  }
 }
 
 export const enviarEmails = async (formData, resultados) => {
