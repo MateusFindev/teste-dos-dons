@@ -207,18 +207,8 @@ export const enviarEmails = async (formData, resultados) => {
   }
 }
 
-export const validarConfiguracaoEmail = () => {
-  const valid =
-    !!EMAILJS_CONFIG.serviceId &&
-    !!EMAILJS_CONFIG.templateId &&
-    !!EMAILJS_CONFIG.publicKey &&
-    EMAILJS_CONFIG.publicKey !== 'YOUR_PUBLIC_KEY'
-
-  return {
-    isConfigured: valid,
-    message: valid
-      ? 'EmailJS configurado corretamente'
-      : 'Defina VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID e VITE_EMAILJS_PUBLIC_KEY no .env'
-  }
-}
+export const validarConfiguracaoEmail = () => ({
+  isConfigured: true,
+  message: 'Envio via API serverless habilitado'
+})
 

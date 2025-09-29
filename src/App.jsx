@@ -145,43 +145,35 @@ function App() {
     try {
       const resultados = calcularResultados()
 
-      // Salvar no Firebase
+      // 1) Salva no Firebase
       await salvarResultado(formData, resultados)
       setSaveStatus('success')
       setAutoSaved(true)
 
-      // Verificar se EmailJS está configurado
-      const configEmail = validarConfiguracaoEmail()
-
-      // Só envia e só mostra status da secretaria para as igrejas do set
+      // 2) Envia e-mails SEM depender do "validarConfiguracaoEmail"
       const deveEnviarSecretaria = IGREJAS_COM_AVISO.has(formData.igreja)
 
-      if (configEmail.isConfigured) {
-        // Envia em paralelo: usuário sempre (se não tiver email, sua service já retorna success),
-        // secretaria apenas se aplicável
-        const [usuarioRes, secretariaRes] = await Promise.all([
-          enviarEmailUsuario(formData, resultados),
-          deveEnviarSecretaria
-            ? enviarEmailSecretaria(formData, resultados)
-            : Promise.resolve({ success: true, skipped: true }) // pulado
-        ])
-
-        setEmailStatus({
-          enviando: false,
-          secretaria: secretariaRes.success ? 'success' : 'error',
-          usuario: usuarioRes.success ? 'success' : 'error'
-        })
-      } else {
-        // EmailJS não configurado
-        setEmailStatus({
-          enviando: false,
-          // se não deve enviar para secretaria, marcamos como 'skipped' (a linha estará oculta)
-          secretaria: deveEnviarSecretaria ? 'not_configured' : 'skipped',
-          usuario: 'not_configured'
-        })
+      // envia secretaria (se aplicável)
+      let resSecretaria = { success: true, skipped: true }
+      if (deveEnviarSecretaria) {
+        resSecretaria = await enviarEmailSecretaria(formData, resultados)
+        // rate limit: 1 req/seg → pequena pausa antes do e-mail do usuário
+        await new Promise(r => setTimeout(r, 1200))
       }
+
+      // envia usuário (se e-mail informado, sua service já trata caso vazio)
+      const resUsuario = await enviarEmailUsuario(formData, resultados)
+
+      setEmailStatus({
+        enviando: false,
+        secretaria: deveEnviarSecretaria
+          ? (resSecretaria.success ? 'success' : 'error')
+          : 'skipped',
+        usuario: resUsuario.success ? 'success' : 'error'
+      })
+
     } catch (error) {
-      console.error('Erro ao salvar automaticamente:', error)
+      console.error('Erro ao salvar/enviar:', error)
       setSaveStatus('error')
       setEmailStatus({
         enviando: false,
