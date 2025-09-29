@@ -127,12 +127,11 @@ const buildTemplateParams = (formData, resultados, opts = {}) => {
   }
 }
 
-// chamada à API serverless
 const enviarViaApi = async (templateParams) => {
   const resp = await fetch('/api/emailjs/send', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(templateParams)
+    body: JSON.stringify({ template_params: templateParams }) // <— aninhado
   })
   const data = await resp.json().catch(() => ({}))
   if (!resp.ok || !data?.ok) {
