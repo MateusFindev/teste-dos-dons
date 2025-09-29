@@ -187,46 +187,62 @@ function App() {
 
 
   const exportarPDF = async () => {
-    // Função desabilitada temporariamente
-    alert('Função de exportar PDF temporariamente desabilitada. Em breve estará disponível!')
-    return
-    
     if (!resultadosRef.current) {
-      alert('Erro: Não foi possível encontrar o conteúdo para exportar.')
+      alert('Não encontrei a seção de resultados para exportar.')
       return
     }
-    
+
     setIsExporting(true)
-    
+
+    // vamos clonar o nó para não mexer no layout da página ao exportar
+    const original = resultadosRef.current
+    const clone = original.cloneNode(true)
+
+    // força fundo branco e largura A4 (~794px @96dpi) para evitar quebra estranha
+    Object.assign(clone.style, {
+      background: '#ffffff',
+      padding: '24px',
+      width: '794px',
+      maxWidth: '794px',
+      boxShadow: 'none'
+    })
+
+    document.body.appendChild(clone)
+
     try {
-      const element = resultadosRef.current
-      
+      const filenameSafe =
+        `Teste_dos_Dons_${(formData.nome || 'Participante')
+          .replace(/[^\w]+/g, '_')}_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`
+
       const options = {
-        margin: 10,
-        filename: `Teste_dos_Dons_${formData.nome.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-          scale: 2,
+        margin: [10, 10, 10, 10], // mm
+        filename: filenameSafe,
+        image: { type: 'jpeg', quality: 0.96 },
+        html2canvas: {
+          scale: Math.min(2, window.devicePixelRatio || 2),
           useCORS: true,
           allowTaint: false,
-          backgroundColor: '#ffffff'
+          backgroundColor: '#ffffff',
+          scrollX: 0,
+          scrollY: -window.scrollY, // evita deslocamento
+          windowWidth: clone.scrollWidth,
+          windowHeight: clone.scrollHeight
         },
-        jsPDF: { 
-          unit: 'mm', 
-          format: 'a4', 
-          orientation: 'portrait' 
-        }
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['css', 'legacy'] } // respeita CSS e tenta quebrar “bonito”
       }
-      
-      await html2pdf().set(options).from(element).save()
-      
+
+      await html2pdf().set(options).from(clone).save()
     } catch (error) {
       console.error('Erro ao gerar PDF:', error)
-      alert(`Erro ao gerar PDF: ${error.message}. Tente usar a função de impressão do navegador como alternativa.`)
+      alert(`Erro ao gerar PDF: ${error?.message || error}`)
     } finally {
       setIsExporting(false)
+      // limpa o clone
+      if (clone && clone.parentNode) clone.parentNode.removeChild(clone)
     }
   }
+
 
   const renderInicio = () => (
     <Card className="w-full max-w-2xl mx-auto">
@@ -697,16 +713,17 @@ function App() {
 
         {/* Botões de Ação */}
         <div className="flex flex-col gap-3 md:gap-4 justify-center max-w-6xl mx-auto px-4">
-          <Button 
-            onClick={exportarPDF} 
-            disabled={true}
-            variant="outline" 
+          <Button
+            onClick={exportarPDF}
+            disabled={isExporting}
+            variant="outline"
             size="lg"
-            className="w-full md:max-w-xs md:mx-auto opacity-50 cursor-not-allowed"
+            className="w-full md:max-w-xs md:mx-auto"
           >
             <Download className="mr-2 h-4 md:h-5 w-4 md:w-5" />
-            Baixar PDF (Em breve)
+            {isExporting ? 'Gerando PDF...' : 'Baixar PDF'}
           </Button>
+
           <Button 
             onClick={() => {
               setCurrentStep(0)

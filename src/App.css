@@ -117,4 +117,9 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  @media print {
+    .avoid-break-inside { page-break-inside: avoid; }
+    .page-break { page-break-before: always; }
+  }
 }
