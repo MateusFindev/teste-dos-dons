@@ -528,6 +528,7 @@ function App() {
                   </div>
                 ) : (
                   <div className="ml-6 space-y-1">
+                    {IGREJAS_COM_AVISO.has(formData.igreja) && (
                     <div className="flex items-center gap-2">
                       {emailStatus.secretaria === 'success' ? (
                         <MailCheck className="h-3 w-3 text-green-600" />
@@ -539,11 +540,12 @@ function App() {
                       <span className="text-xs">
                         Secretaria da igreja: {
                           emailStatus.secretaria === 'success' ? 'Enviado com sucesso' :
-                          emailStatus.secretaria === 'not_configured' ? 'EmailJS não configurado' :
+                          emailStatus.secretaria === 'not_configured' ? 'Não enviado :(' :
                           'Erro no envio'
                         }
                       </span>
                     </div>
+                    )}
                     
                     {formData.email && (
                       <div className="flex items-center gap-2">
@@ -557,7 +559,7 @@ function App() {
                         <span className="text-xs">
                           Seu email ({formData.email}): {
                             emailStatus.usuario === 'success' ? 'Enviado com sucesso' :
-                            emailStatus.usuario === 'not_configured' ? 'EmailJS não configurado' :
+                            emailStatus.usuario === 'not_configured' ? 'Não enviado :(' :
                             'Erro no envio'
                           }
                         </span>
