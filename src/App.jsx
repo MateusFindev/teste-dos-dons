@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ChevronLeft, ChevronRight, Users, Download, BarChart3, Trophy, Medal, Award, AlertCircle, Check, Mail, MailCheck } from 'lucide-react'
 import html2pdf from 'html2pdf.js'
 import { salvarResultado } from './lib/firebaseService'
-import { enviarEmails, validarConfiguracaoEmail } from './lib/emailService'
+import { enviarEmailUsuario, enviarEmailSecretaria, validarConfiguracaoEmail } from './lib/emailService'
 import dadosFormulario from './assets/dados_formulario.json'
 import './App.css'
 
