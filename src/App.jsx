@@ -186,6 +186,45 @@ function App() {
   }
 
 
+  const sanitizarCores = (root) => {
+    const hasOKLCH = (v) => typeof v === 'string' && v.includes('oklch(')
+    const setSafe = (el, prop, val) => { try { el.style[prop] = val } catch { /* ignore */ } }
+
+    const processEl = (el) => {
+      const cs = getComputedStyle(el)
+
+      // background / gradient
+      if (hasOKLCH(cs.backgroundImage) || hasOKLCH(cs.background)) {
+        setSafe(el, 'backgroundImage', 'none')
+        if (hasOKLCH(cs.backgroundColor)) {
+          setSafe(el, 'backgroundColor', '#ffffff')
+        } else {
+          setSafe(el, 'backgroundColor', cs.backgroundColor || '#ffffff')
+        }
+      }
+      if (hasOKLCH(cs.backgroundColor)) setSafe(el, 'backgroundColor', '#ffffff')
+
+      // texto
+      if (hasOKLCH(cs.color)) setSafe(el, 'color', '#111111')
+
+      // bordas
+      ;['borderTopColor','borderRightColor','borderBottomColor','borderLeftColor'].forEach((p) => {
+        if (hasOKLCH(cs[p])) setSafe(el, p, '#e5e7eb')
+      })
+    }
+
+    // aplica no root e filhos
+    processEl(root)
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT)
+    let node
+    while ((node = walker.nextNode())) processEl(node)
+
+    // força um gradiente seguro onde você usa bg-gradient-to-r
+    root.querySelectorAll('.bg-gradient-to-r').forEach((el) => {
+      el.style.backgroundImage = 'linear-gradient(90deg, #4f46e5, #8b5cf6)'
+    })
+  }
+
   const exportarPDF = async () => {
     if (!resultadosRef.current) {
       alert('Não encontrei a seção de resultados para exportar.')
@@ -194,28 +233,28 @@ function App() {
 
     setIsExporting(true)
 
-    // vamos clonar o nó para não mexer no layout da página ao exportar
     const original = resultadosRef.current
     const clone = original.cloneNode(true)
 
-    // força fundo branco e largura A4 (~794px @96dpi) para evitar quebra estranha
     Object.assign(clone.style, {
       background: '#ffffff',
       padding: '24px',
-      width: '794px',
+      width: '794px',        // ~A4 @96dpi
       maxWidth: '794px',
       boxShadow: 'none'
     })
 
     document.body.appendChild(clone)
 
+    // <<< solução do erro oklch
+    sanitizarCores(clone)
+
     try {
       const filenameSafe =
-        `Teste_dos_Dons_${(formData.nome || 'Participante')
-          .replace(/[^\w]+/g, '_')}_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`
+        `Teste_dos_Dons_${(formData.nome || 'Participante').replace(/[^\w]+/g, '_')}_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`
 
       const options = {
-        margin: [10, 10, 10, 10], // mm
+        margin: [10, 10, 10, 10],
         filename: filenameSafe,
         image: { type: 'jpeg', quality: 0.96 },
         html2canvas: {
@@ -224,12 +263,12 @@ function App() {
           allowTaint: false,
           backgroundColor: '#ffffff',
           scrollX: 0,
-          scrollY: -window.scrollY, // evita deslocamento
+          scrollY: -window.scrollY,
           windowWidth: clone.scrollWidth,
           windowHeight: clone.scrollHeight
         },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['css', 'legacy'] } // respeita CSS e tenta quebrar “bonito”
+        pagebreak: { mode: ['css', 'legacy'] }
       }
 
       await html2pdf().set(options).from(clone).save()
@@ -238,14 +277,12 @@ function App() {
       alert(`Erro ao gerar PDF: ${error?.message || error}`)
     } finally {
       setIsExporting(false)
-      // limpa o clone
       if (clone && clone.parentNode) clone.parentNode.removeChild(clone)
     }
   }
 
-
   const renderInicio = () => (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="w-full max-w-2xl mx-auto"> 
       <CardHeader className="text-center">
         <CardTitle className="text-3xl font-bold text-primary mb-2">
           {dadosFormulario.titulo}
