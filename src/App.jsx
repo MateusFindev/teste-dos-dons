@@ -137,14 +137,14 @@ function App() {
 
   const salvarAutomaticamenteEEnviarEmails = async () => {
     if (autoSaved) return
-    
+
     setIsSaving(true)
     setSaveStatus(null)
     setEmailStatus({ enviando: true, secretaria: null, usuario: null })
-    
+
     try {
       const resultados = calcularResultados()
-      
+
       // Salvar no Firebase
       await salvarResultado(formData, resultados)
       setSaveStatus('success')
@@ -152,25 +152,34 @@ function App() {
 
       // Verificar se EmailJS está configurado
       const configEmail = validarConfiguracaoEmail()
-      
+
+      // Só envia e só mostra status da secretaria para as igrejas do set
+      const deveEnviarSecretaria = IGREJAS_COM_AVISO.has(formData.igreja)
+
       if (configEmail.isConfigured) {
-        // Enviar emails
-        const resultadosEmail = await enviarEmails(formData, resultados)
-        
+        // Envia em paralelo: usuário sempre (se não tiver email, sua service já retorna success),
+        // secretaria apenas se aplicável
+        const [usuarioRes, secretariaRes] = await Promise.all([
+          enviarEmailUsuario(formData, resultados),
+          deveEnviarSecretaria
+            ? enviarEmailSecretaria(formData, resultados)
+            : Promise.resolve({ success: true, skipped: true }) // pulado
+        ])
+
         setEmailStatus({
           enviando: false,
-          secretaria: resultadosEmail.secretaria.success ? 'success' : 'error',
-          usuario: resultadosEmail.usuario.success ? 'success' : 'error'
+          secretaria: secretariaRes.success ? 'success' : 'error',
+          usuario: usuarioRes.success ? 'success' : 'error'
         })
       } else {
         // EmailJS não configurado
         setEmailStatus({
           enviando: false,
-          secretaria: 'not_configured',
+          // se não deve enviar para secretaria, marcamos como 'skipped' (a linha estará oculta)
+          secretaria: deveEnviarSecretaria ? 'not_configured' : 'skipped',
           usuario: 'not_configured'
         })
       }
-
     } catch (error) {
       console.error('Erro ao salvar automaticamente:', error)
       setSaveStatus('error')
@@ -183,6 +192,7 @@ function App() {
       setIsSaving(false)
     }
   }
+
 
   const exportarPDF = async () => {
     // Função desabilitada temporariamente
