@@ -820,7 +820,7 @@ function App() {
     ]
 
     return (
-      <div className="space-y-6 md:space-y-8 px-2 md:px-4">
+      <div id="print-area" className="space-y-6 md:space-y-8 px-2 md:px-4">
         <Card className="w-full max-w-4xl mx-auto">
           <CardHeader className="text-center bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-t-lg p-6">
             <div className="mx-auto w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-3">
