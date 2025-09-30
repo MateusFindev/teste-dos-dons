@@ -696,7 +696,8 @@ function App() {
                 </h3>
                 <div className="space-y-3 md:space-y-4">
                   {resultados.map((dom, index) => (
-                    <div key={dom.nome} className="flex items-center justify-between p-3 md:p-6 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg shadow-sm hover:shadow-md transition-shadow print-gray">                      <div className="flex items-center gap-2 md:gap-4 flex-1 min-w-0">
+                    <div key={dom.nome} className="flex items-center justify-between p-3 md:p-6 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg shadow-sm hover:shadow-md transition-shadow print-gray">                      
+                    <div className="flex items-center gap-2 md:gap-4 flex-1 min-w-0">
                         <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-white text-sm md:text-base ${
                           index < 3 ? 'bg-gradient-to-r from-blue-500 to-purple-600' : 'bg-gray-400'
                         }`}>
@@ -705,11 +706,8 @@ function App() {
                         <span className="font-bold text-sm md:text-lg truncate">{dom.nome}</span>
                       </div>
                       <div className="flex items-center gap-2 md:gap-6 flex-shrink-0">
-                        <div className="w-20 md:w-40 bg-gray-200 rounded-full h-2 md:h-3">
-                          <div 
-                            className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 md:h-3 rounded-full transition-all duration-1000 ease-out"
-                            style={{ width: `${dom.percentual}%` }}
-                          ></div>
+                        <div className="w-20 md:w-40 bg-gray-200 rounded-full h-2 md:h-3 print-progress-track">
+                          <div className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 md:h-3 rounded-full print-progress" style={{ width: `${dom.percentual}%` }}></div>
                         </div>
                         <div className="text-right min-w-[60px] md:min-w-[100px]">
                           <div className="font-bold text-sm md:text-xl text-blue-600">
@@ -822,7 +820,7 @@ function App() {
     return (
       <div id="print-area" className="space-y-6 md:space-y-8 px-2 md:px-4">
         <Card className="w-full max-w-4xl mx-auto">
-          <CardHeader className="text-center bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-t-lg p-6">
+          <CardHeader className="text-center bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-t-lg p-6 print-header">
             <div className="mx-auto w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-3">
               <BookOpen className="h-8 w-8" />
             </div>
@@ -833,7 +831,7 @@ function App() {
           </CardHeader>
 
           <CardContent className="p-4 md:p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 print-gray">
               {nomesOrdenados.map(({ nome }) => {
                 const desc = mapaDescricoes.get(nome) || 'Descrição em breve.'
                 const isTop = top3Nomes.includes(nome)

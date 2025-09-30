@@ -122,12 +122,13 @@
 @media print {
   @page { size: A4 portrait; margin: 12mm; }
 
-  /* imprime só a área de resultados */
   html, body {
     background: #ffffff !important;
     -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
   }
+
+  /* imprime só a área ativa */
   body * { visibility: hidden !important; }
   #print-area, #print-area * { visibility: visible !important; }
   #print-area {
@@ -137,51 +138,47 @@
     width: 100% !important;
   }
 
-  /* ---------- Regras de cor na impressão (HEX, sem oklch/gradiente) ---------- */
+  /* ===== CORES NA IMPRESSÃO ===== */
 
-  /* 1) Por padrão, toda superfície “gradiente” vira CINZA CLARO */
-  #print-area .bg-gradient-to-r,
-  #print-area .bg-gradient-to-l,
-  #print-area .bg-gradient-to-t,
-  #print-area .bg-gradient-to-b,
-  #print-area .bg-gradient-to-tr,
-  #print-area .bg-gradient-to-tl,
-  #print-area .bg-gradient-to-br,
-  #print-area .bg-gradient-to-bl,
-  #print-area .print-gray {
-    background-image: none !important;
-    background-color: #f3f4f6 !important; /* gray-100 */
-    color: #111111 !important;
-  }
-
-  /* 2) EXCEÇÕES em AZUL: cabeçalho + top 3 */
+  /* Cabeçalho e Top 3: azul sólido, texto branco */
   #print-area .print-header,
   #print-area .print-top3-card {
     background-image: none !important;
     background-color: #2563eb !important; /* blue-600 */
     color: #ffffff !important;
   }
-
-  /* elementos internos “badge”/brancos dentro do cabeçalho/top3 */
-  #print-area .print-header .bg-white,
-  #print-area .print-top3-card .bg-white {
-    background: rgba(255,255,255,0.2) !important;
+  #print-area .print-header .text-white,
+  #print-area .print-top3-card .text-white {
+    color: #ffffff !important;
   }
 
-  /* 3) Ajustes de contraste e limpeza de sombras p/ impressão */
-  #print-area .text-white { color: #ffffff !important; }
-  #print-area .text-gray-800,
-  #print-area .text-gray-700,
-  #print-area .text-gray-600 { color: #111111 !important; }
+  /* Lista completa (cartões): cinza médio com borda, texto escuro */
+  #print-area .print-gray {
+    background-image: none !important;
+    background-color: #e5e7eb !important; /* gray-200 (mais escuro que o gray-100) */
+    border-color: #cbd5e1 !important;     /* slate-300 */
+    color: #111111 !important;
+  }
 
-  #print-area .shadow,
-  #print-area .shadow-sm,
-  #print-area .shadow-md,
-  #print-area .shadow-lg,
-  #print-area .shadow-xl,
-  #print-area .shadow-2xl { box-shadow: none !important; }
+  /* Barras de progresso: trilha cinza + preenchimento azul forte */
+  #print-area .print-progress-track {
+    background-color: #d1d5db !important; /* gray-300 */
+  }
+  #print-area .print-progress {
+    background-image: none !important;
+    background-color: #1d4ed8 !important; /* blue-700 (destaca no cinza) */
+  }
 
-  /* 4) Quebras de página opcionais */
+  /* Evita sombras lavadas e garante contraste de textos */
+  #print-area .shadow, #print-area .shadow-sm, #print-area .shadow-md,
+  #print-area .shadow-lg, #print-area .shadow-xl, #print-area .shadow-2xl {
+    box-shadow: none !important;
+  }
+  #print-area .text-gray-800, #print-area .text-gray-700, #print-area .text-gray-600 {
+    color: #111111 !important;
+  }
+
+  /* Quebras de página */
   .avoid-break-inside { break-inside: avoid; page-break-inside: avoid; }
   .page-break { break-before: page; page-break-before: always; }
 }
