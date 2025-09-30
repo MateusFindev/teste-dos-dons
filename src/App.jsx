@@ -766,7 +766,7 @@ function App() {
         {/* Botões de Ação */}
         <div className="flex flex-col gap-3 md:gap-4 justify-center max-w-6xl mx-auto px-4 print-hide">
           <Button
-            onClick={() => printNode(resultadosRef.current)}
+            onClick={() => window.print()}
             variant="outline"
             size="lg"
             className="w-full md:max-w-xs md:mx-auto"
@@ -821,7 +821,7 @@ function App() {
     ]
 
     return (
-      <div ref={explicacoesRef} className="space-y-6 md:space-y-8 px-2 md:px-4">
+      <div id="print-area" ref={explicacoesRef} className="space-y-6 md:space-y-8 px-2 md:px-4">
         <Card className="w-full max-w-4xl mx-auto">
           <CardHeader className="text-center bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-t-lg p-6 print-header">
             <div className="mx-auto w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-3">
@@ -861,7 +861,7 @@ function App() {
                 <ChevronLeft className="mr-2 h-4 w-4" />
                 Voltar aos resultados
               </Button>
-              <Button onClick={() => printNode(explicacoesRef.current)} className="flex-1" variant="secondary">
+              <Button onClick={() => window.print()} className="flex-1" variant="secondary">
                 <Download className="mr-2 h-4 w-4" />
                 Imprimir / Salvar PDF
               </Button>
@@ -874,7 +874,7 @@ function App() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-4 md:py-8 px-2 md:px-4">
+    <div id="app-root" className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-4 md:py-8 px-2 md:px-4">
       <div className="container mx-auto">
         {/* Barra de Progresso */}
         {currentStep > 0 && currentStep < totalSteps && (
@@ -897,70 +897,6 @@ function App() {
       </div>
     </div>
   )
-}
-
-const printNode = (node) => {
-  if (!node) return
-
-  // 1) cria um contêiner isolado de impressão
-  const printRoot = document.createElement('div')
-  printRoot.id = 'print-root'
-  document.body.appendChild(printRoot)
-
-  // 2) clona o conteúdo que queremos imprimir
-  const clone = node.cloneNode(true)
-  printRoot.appendChild(clone)
-
-  // 3) injeta CSS só para a impressão (cores + esconder o resto da página)
-  const style = document.createElement('style')
-  style.textContent = `
-    @media print {
-      /* esconde toda a app */
-      body > *:not(#print-root) { display: none !important; }
-
-      /* mostra só o que vamos imprimir */
-      #print-root { display: block !important; }
-      html, body { background:#fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-
-      /* cores de impressão (iguais às que você aprovou) */
-      #print-root .print-header,
-      #print-root .print-top3-card {
-        background-image: none !important;
-        background-color: #2563eb !important; /* azul */
-        color: #ffffff !important;
-      }
-
-      #print-root .print-gray {
-        background-image: none !important;
-        background-color: #e5e7eb !important; /* cinza médio */
-        border-color: #cbd5e1 !important;
-        color: #111111 !important;
-      }
-
-      #print-root .print-progress-track  { background-color: #d1d5db !important; }
-      #print-root .print-progress        { background-color: #1d4ed8 !important; background-image: none !important; }
-
-      #print-root .shadow, #print-root .shadow-sm, #print-root .shadow-md,
-      #print-root .shadow-lg, #print-root .shadow-xl, #print-root .shadow-2xl {
-        box-shadow: none !important;
-      }
-
-      /* quebras */
-      .avoid-break-inside { break-inside: avoid; page-break-inside: avoid; }
-      .page-break { break-before: page; page-break-before: always; }
-    }
-  `
-  document.head.appendChild(style)
-
-  const cleanup = () => {
-    style.remove()
-    printRoot.remove()
-    window.removeEventListener('afterprint', cleanup)
-  }
-  window.addEventListener('afterprint', cleanup)
-
-  // 4) dispara impressão nativa
-  window.print()
 }
 
 

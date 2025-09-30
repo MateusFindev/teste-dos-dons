@@ -124,36 +124,34 @@
 
   html, body {
     background: #ffffff !important;
-    -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
     margin: 0 !important;
     padding: 0 !important;
+    -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
   }
 
-  /* 1) Esconde TUDO por display (não ocupa espaço) */
-  body * { display: none !important; }
+  /* Esconda apenas o que você marcou */
+  .no-print, .print-hide { display: none !important; }
 
-  /* 2) Mostra SOMENTE a área que queremos imprimir (e seus filhos) */
-  #print-area, #print-area * {
-    display: revert !important;   /* se der problema em algum browser, troque por 'initial' */
-    visibility: visible !important;
-  }
+  /* Mostre só a seção atual dentro da app */
+  #app-root > * { display: none !important; }           /* esconde todos filhos diretos da app */
+  #app-root #print-area { display: block !important; }  /* mostra a seção ativa */
+  #app-root #print-area * { display: revert !important; }
 
-  /* 3) Garante que o conteúdo flua e pagine normalmente */
+  /* Zera qualquer respiro inicial da seção impressa */
   #print-area {
-    position: static !important;  /* REMOVER o 'fixed' anterior */
-    top: auto !important;
-    left: auto !important;
-    width: 100% !important;
+    position: static !important;
     margin: 0 !important;
     padding-top: 0 !important;
     background: #ffffff !important;
   }
+  #print-area > *:first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
 
-  /* 4) Some com blocos internos que você marcou como não imprimíveis */
-  #print-area .print-hide { display: none !important; }
+  /* ===== CORES APROVADAS ===== */
 
-  /* ===== SUAS CORES DESEJADAS ===== */
   /* Cabeçalho e Top 3: azul sólido */
   #print-area .print-header,
   #print-area .print-top3-card {
@@ -174,11 +172,13 @@
   #print-area .print-progress-track  { background-color: #d1d5db !important; } /* gray-300 */
   #print-area .print-progress        { background-color: #1d4ed8 !important; } /* blue-700 */
 
-  /* Limpa sombras e melhora quebras */
+  /* Limpa sombras (impresso fica melhor sem) */
   #print-area .shadow, #print-area .shadow-sm, #print-area .shadow-md,
   #print-area .shadow-lg, #print-area .shadow-xl, #print-area .shadow-2xl {
     box-shadow: none !important;
   }
+
+  /* Quebras suaves */
   .avoid-break-inside { break-inside: avoid; page-break-inside: avoid; }
   .page-break { break-before: page; page-break-before: always; }
 }
