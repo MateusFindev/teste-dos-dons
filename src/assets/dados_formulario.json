@@ -163,7 +163,7 @@
         "perguntas": [5, 18, 31, 44, 57, 70, 83]
       },
       {
-        "nome": "Serviço",
+        "nome": "Ajuda",
         "perguntas": [6, 19, 32, 45, 58, 71, 84]
       },
       {
@@ -191,7 +191,7 @@
         "perguntas": [12, 25, 38, 51, 64, 77, 90]
       },
       {
-        "nome": "Serviço Prático",
+        "nome": "Serviço",
         "perguntas": [13, 26, 39, 52, 65, 78, 91]
       }
     ]

@@ -1,0 +1,54 @@
+[
+  {
+    "nome": "Liderança",
+    "descricao": "É a capacidade de influenciar e motivar pessoas rumo a um objetivo comum, unindo a equipe, transmitindo visão e dando direção. O líder com esse dom serve como guia, coordena esforços e mantém todos focados na missão."
+  },
+  {
+    "nome": "Serviço",
+    "descricao": "É a disposição de atender às necessidades práticas com humildade e amor. Pessoas com esse dom não buscam destaque, mas encontram alegria em ajudar nos bastidores e em tornar a vida de outros mais leve."
+  },
+  {
+    "nome": "Ajuda",
+    "descricao": "Parece semelhante ao serviço, mas vai além: é o dom de apoiar pessoas específicas em suas tarefas e cargas, caminhando junto delas. É ser um braço de apoio constante, trazendo alívio e fortalecimento."
+  },
+  {
+    "nome": "Hospitalidade",
+    "descricao": "É o dom de acolher, receber e criar ambientes de cuidado. Quem o possui transforma lugares em espaços de segurança e pertencimento, abrindo casa, tempo e coração para o próximo."
+  },
+  {
+    "nome": "Ensino",
+    "descricao": "É a habilidade de comunicar verdades bíblicas de forma clara, prática e relevante. O professor com esse dom não transmite apenas informação, mas transforma vidas pelo entendimento da Palavra."
+  },
+  {
+    "nome": "Misericórdia",
+    "descricao": "É a sensibilidade especial para perceber e se compadecer do sofrimento alheio, oferecendo consolo, cuidado e apoio. Pessoas com esse dom são reflexo da ternura de Deus para com os necessitados."
+  },
+  {
+    "nome": "Administração",
+    "descricao": "É o dom de organizar processos, recursos e pessoas para que tudo funcione com ordem e eficiência. Quem o tem consegue transformar ideias em planos e mantê-los funcionando com equilíbrio."
+  },
+  {
+    "nome": "Encorajamento (ou Exortação)",
+    "descricao": "É a habilidade de inspirar, consolar e motivar pessoas a continuarem firmes. O encorajador fala palavras de vida e esperança, ajudando outros a perseverarem e a darem passos de fé."
+  },
+  {
+    "nome": "Contribuição",
+    "descricao": "É a disposição de compartilhar recursos materiais com generosidade, muitas vezes de forma sacrificial. Pessoas com esse dom sentem prazer em sustentar ministérios e suprir necessidades."
+  },
+  {
+    "nome": "Pastoreio",
+    "descricao": "É o dom de cuidar de pessoas como um pastor cuida de suas ovelhas: guiando, protegendo, alimentando espiritualmente e estando presente. Quem o tem se dedica ao crescimento integral de outros."
+  },
+  {
+    "nome": "Evangelismo",
+    "descricao": "É a habilidade de comunicar o evangelho de forma clara e atraente, levando pessoas a conhecerem a Cristo. O evangelista tem paixão por alcançar os perdidos e coragem para testemunhar em qualquer ambiente."
+  },
+  {
+    "nome": "Profecia",
+    "descricao": "É a capacidade de transmitir a verdade de Deus de maneira direta e relevante para o presente, trazendo correção, encorajamento ou alerta. O profeta é voz que chama à fidelidade ao Senhor."
+  },
+  {
+    "nome": "Oração (ou Intercessão)",
+    "descricao": "É o dom de dedicar-se à oração de forma intensa e perseverante, intercedendo por pessoas, causas e situações. Quem tem esse dom sente carga espiritual e vê Deus agir em resposta à oração."
+  }
+]

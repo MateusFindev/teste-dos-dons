@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input.jsx'
 import { Label } from '@/components/ui/label.jsx'
 import { Progress } from '@/components/ui/progress.jsx'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.jsx'
-import { ChevronLeft, ChevronRight, Users, Download, BarChart3, Trophy, Medal, Award, AlertCircle, Check, Mail, MailCheck } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Users, Download, BarChart3, Trophy, Medal, Award, AlertCircle, Check, Mail, MailCheck, BookOpen } from 'lucide-react'
+import explicacoesDons from './assets/explicacoes_dons'
 import html2pdf from 'html2pdf.js'
 import { salvarResultado } from './lib/firebaseService'
 import { enviarEmailUsuario, enviarEmailSecretaria, validarConfiguracaoEmail } from './lib/emailService'
@@ -32,6 +33,11 @@ function App() {
   const resultadosRef = useRef(null)
   const IGREJAS_COM_AVISO = new Set(['OBPC Cafelândia'])
 
+  const MAPA_SINONIMOS = {
+  'Encorajamento': 'Encorajamento (ou Exortação)',
+  'Oração': 'Oração (ou Intercessão)',
+  'Serviço Prático': 'Serviço'
+}
 
   const totalSteps = 9 // início + 7 testes + resultados
   const progressPercentage = (currentStep / totalSteps) * 100
@@ -760,6 +766,14 @@ function App() {
             Imprimir / Salvar como PDF
           </Button>
 
+          <Button 
+            onClick={() => setCurrentStep(10)}
+            size="lg"
+            className="w-full md:max-w-xs md:mx-auto"
+          >
+            <BookOpen className="mr-2 h-4 md:h-5 w-4 md:w-5" />
+            Explicação de cada dom
+          </Button>
 
           <Button 
             onClick={() => {
@@ -779,6 +793,76 @@ function App() {
       </div>
     )
   }
+
+  const renderExplicacoes = () => {
+    // recalcula resultados para destacar top 3
+    const resultados = calcularResultados()
+    const top3Nomes = resultados.slice(0, 3).map(d => MAPA_SINONIMOS[d.nome] || d.nome)
+
+    // cria um mapa nome->descricao a partir do JSON
+    const mapaDescricoes = new Map(explicacoesDons.map(d => [d.nome, d.descricao]))
+
+    // ordena por: top3 primeiro (na ordem), depois alfabético
+    const nomesOrdenados = [
+      ...explicacoesDons
+        .filter(d => top3Nomes.includes(d.nome)),
+      ...explicacoesDons
+        .filter(d => !top3Nomes.includes(d.nome))
+        .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
+    ]
+
+    return (
+      <div className="space-y-6 md:space-y-8 px-2 md:px-4">
+        <Card className="w-full max-w-4xl mx-auto">
+          <CardHeader className="text-center bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-t-lg p-6">
+            <div className="mx-auto w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-3">
+              <BookOpen className="h-8 w-8" />
+            </div>
+            <CardTitle className="text-2xl md:text-3xl font-bold">
+              Explicação de cada dom
+            </CardTitle>
+            <p className="text-blue-100 mt-1">Veja o significado e a aplicação prática</p>
+          </CardHeader>
+
+          <CardContent className="p-4 md:p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+              {nomesOrdenados.map(({ nome }) => {
+                const desc = mapaDescricoes.get(nome) || 'Descrição em breve.'
+                const isTop = top3Nomes.includes(nome)
+                return (
+                  <div
+                    key={nome}
+                    className={`relative p-4 rounded-xl border shadow-sm bg-white hover:shadow-md transition
+                      ${isTop ? 'border-blue-500 ring-2 ring-blue-200' : 'border-gray-200'}`}
+                  >
+                    {isTop && (
+                      <span className="absolute -top-2 right-3 inline-block text-xs font-bold text-white bg-gradient-to-r from-blue-500 to-purple-600 px-2 py-0.5 rounded-full shadow">
+                        TOP 3
+                      </span>
+                    )}
+                    <h4 className="font-bold text-lg text-gray-900">{nome}</h4>
+                    <p className="text-gray-700 text-sm mt-2 leading-relaxed">{desc}</p>
+                  </div>
+                )
+              })}
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 mt-6">
+              <Button variant="outline" onClick={() => setCurrentStep(9)} className="flex-1">
+                <ChevronLeft className="mr-2 h-4 w-4" />
+                Voltar aos resultados
+              </Button>
+              <Button onClick={() => window.print()} className="flex-1" variant="secondary">
+                <Download className="mr-2 h-4 w-4" />
+                Imprimir / Salvar PDF
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-4 md:py-8 px-2 md:px-4">
@@ -800,6 +884,7 @@ function App() {
         {currentStep === 7 && renderAviso()}
         {currentStep === 8 && renderTeste(7)}
         {currentStep === 9 && renderResultados()}
+        {currentStep === 10 && renderExplicacoes()}
       </div>
     </div>
   )
