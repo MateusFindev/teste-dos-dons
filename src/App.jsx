@@ -552,7 +552,7 @@ function App() {
       <div className="space-y-4 md:space-y-6 px-2 md:px-4">
         {/* Status de Salvamento e Email */}
         {(saveStatus || isSaving || emailStatus.enviando) && (
-          <div className="max-w-6xl mx-auto space-y-3">
+          <div className="max-w-6xl mx-auto space-y-3 no-print">
             {/* Status de Salvamento */}
             <div className={`p-3 md:p-4 rounded-lg border text-sm md:text-base ${
               saveStatus === 'success' 
@@ -831,7 +831,7 @@ function App() {
           </CardHeader>
 
           <CardContent className="p-4 md:p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 print-gray">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               {nomesOrdenados.map(({ nome }) => {
                 const desc = mapaDescricoes.get(nome) || 'Descrição em breve.'
                 const isTop = top3Nomes.includes(nome)
@@ -853,7 +853,7 @@ function App() {
               })}
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 mt-6">
+            <div className="flex flex-col sm:flex-row gap-3 mt-6 no-print">
               <Button variant="outline" onClick={() => setCurrentStep(9)} className="flex-1">
                 <ChevronLeft className="mr-2 h-4 w-4" />
                 Voltar aos resultados
