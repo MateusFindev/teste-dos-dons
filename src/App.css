@@ -130,15 +130,18 @@
             print-color-adjust: exact;
   }
 
-  /* Esconda apenas o que você marcou */
-  .no-print, .print-hide { display: none !important; }
+  /* Esconda TUDO que está na app... */
+  #app-root > * { display: none !important; }
 
-  /* Mostre só a seção atual dentro da app */
-  #app-root > * { display: none !important; }           /* esconde todos filhos diretos da app */
-  #app-root #print-area { display: block !important; }  /* mostra a seção ativa */
+  /* ...exceto a seção ativa que queremos imprimir */
+  #app-root #print-area { display: block !important; }
   #app-root #print-area * { display: revert !important; }
 
-  /* Zera qualquer respiro inicial da seção impressa */
+  /* Itens marcados para não imprimir */
+  #print-area .no-print,
+  #print-area .print-hide { display: none !important; }
+
+  /* Zerar respiros no topo da seção impressa */
   #print-area {
     position: static !important;
     margin: 0 !important;
@@ -151,7 +154,6 @@
   }
 
   /* ===== CORES APROVADAS ===== */
-
   /* Cabeçalho e Top 3: azul sólido */
   #print-area .print-header,
   #print-area .print-top3-card {
@@ -172,7 +174,7 @@
   #print-area .print-progress-track  { background-color: #d1d5db !important; } /* gray-300 */
   #print-area .print-progress        { background-color: #1d4ed8 !important; } /* blue-700 */
 
-  /* Limpa sombras (impresso fica melhor sem) */
+  /* Sombras fora na impressão */
   #print-area .shadow, #print-area .shadow-sm, #print-area .shadow-md,
   #print-area .shadow-lg, #print-area .shadow-xl, #print-area .shadow-2xl {
     box-shadow: none !important;
@@ -182,3 +184,4 @@
   .avoid-break-inside { break-inside: avoid; page-break-inside: avoid; }
   .page-break { break-before: page; page-break-before: always; }
 }
+
