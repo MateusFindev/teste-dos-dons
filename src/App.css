@@ -124,64 +124,61 @@
 
   html, body {
     background: #ffffff !important;
-    margin: 0 !important;
-    padding: 0 !important;
     -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
   }
 
-  /* Esconda TUDO que está na app... */
-  #app-root > * { display: none !important; }
-
-  /* ...exceto a seção ativa que queremos imprimir */
-  #app-root #print-area { display: block !important; }
-  #app-root #print-area * { display: revert !important; }
-
-  /* Itens marcados para não imprimir */
-  #print-area .no-print,
-  #print-area .print-hide { display: none !important; }
-
-  /* Zerar respiros no topo da seção impressa */
+  /* imprime só a área ativa */
+  body * { visibility: hidden !important; }
+  #print-area, #print-area * { visibility: visible !important; }
   #print-area {
-    position: static !important;
-    margin: 0 !important;
-    padding-top: 0 !important;
-    background: #ffffff !important;
-  }
-  #print-area > *:first-child {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
+    position: relative !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
   }
 
-  /* ===== CORES APROVADAS ===== */
-  /* Cabeçalho e Top 3: azul sólido */
+  /* ===== CORES NA IMPRESSÃO ===== */
+
+  /* Cabeçalho e Top 3: azul sólido, texto branco */
   #print-area .print-header,
   #print-area .print-top3-card {
     background-image: none !important;
     background-color: #2563eb !important; /* blue-600 */
     color: #ffffff !important;
   }
+  #print-area .print-header .text-white,
+  #print-area .print-top3-card .text-white {
+    color: #ffffff !important;
+  }
 
-  /* Lista completa: cinza médio + borda + texto escuro */
+  /* Lista completa (cartões): cinza médio com borda, texto escuro */
   #print-area .print-gray {
     background-image: none !important;
-    background-color: #e5e7eb !important; /* gray-200 */
+    background-color: #e5e7eb !important; /* gray-200 (mais escuro que o gray-100) */
     border-color: #cbd5e1 !important;     /* slate-300 */
     color: #111111 !important;
   }
 
-  /* Barras de progresso */
-  #print-area .print-progress-track  { background-color: #d1d5db !important; } /* gray-300 */
-  #print-area .print-progress        { background-color: #1d4ed8 !important; } /* blue-700 */
+  /* Barras de progresso: trilha cinza + preenchimento azul forte */
+  #print-area .print-progress-track {
+    background-color: #d1d5db !important; /* gray-300 */
+  }
+  #print-area .print-progress {
+    background-image: none !important;
+    background-color: #1d4ed8 !important; /* blue-700 (destaca no cinza) */
+  }
 
-  /* Sombras fora na impressão */
+  /* Evita sombras lavadas e garante contraste de textos */
   #print-area .shadow, #print-area .shadow-sm, #print-area .shadow-md,
   #print-area .shadow-lg, #print-area .shadow-xl, #print-area .shadow-2xl {
     box-shadow: none !important;
   }
+  #print-area .text-gray-800, #print-area .text-gray-700, #print-area .text-gray-600 {
+    color: #111111 !important;
+  }
 
-  /* Quebras suaves */
+  /* Quebras de página */
   .avoid-break-inside { break-inside: avoid; page-break-inside: avoid; }
   .page-break { break-before: page; page-break-before: always; }
 }
-

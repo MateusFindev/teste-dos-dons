@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress.jsx'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.jsx'
 import { ChevronLeft, ChevronRight, Users, Download, BarChart3, Trophy, Medal, Award, AlertCircle, Check, Mail, MailCheck, BookOpen } from 'lucide-react'
 import explicacoesDons from './assets/explicacoes_dons'
+import html2pdf from 'html2pdf.js'
 import { salvarResultado } from './lib/firebaseService'
 import { enviarEmailUsuario, enviarEmailSecretaria, validarConfiguracaoEmail } from './lib/emailService'
 import dadosFormulario from './assets/dados_formulario.json'
@@ -25,7 +26,7 @@ function App() {
   const [formData, setFormData] = useState(() => ({
     nome: DEV ? 'Teste Rápido' : '',
     igreja: DEV ? 'OBPC Cafelândia' : '',
-    email: DEV ? 'dev' : '',
+    email: DEV ? 'dev@example.com' : '',
     respostas: {}
   }))
 
@@ -38,17 +39,14 @@ function App() {
     secretaria: null, // 'success', 'error', null
     usuario: null // 'success', 'error', null
   })
-
+  const resultadosRef = useRef(null)
   const IGREJAS_COM_AVISO = new Set(['OBPC Cafelândia'])
 
   const MAPA_SINONIMOS = {
-    'Encorajamento': 'Encorajamento (ou Exortação)',
-    'Oração': 'Oração (ou Intercessão)',
-    'Serviço Prático': 'Serviço'
-  } 
-
-  const resultadosRef = useRef(null)
-  const explicacoesRef = useRef(null)
+  'Encorajamento': 'Encorajamento (ou Exortação)',
+  'Oração': 'Oração (ou Intercessão)',
+  'Serviço Prático': 'Serviço'
+}
 
   const totalSteps = 9 // início + 7 testes + resultados
   const progressPercentage = (currentStep / totalSteps) * 100
@@ -288,6 +286,7 @@ function App() {
         pagebreak: { mode: ['css', 'legacy'] }
       }
 
+      await html2pdf().set(options).from(clone).save()
     } catch (error) {
       console.error('Erro ao gerar PDF:', error)
       alert(`Erro ao gerar PDF: ${error?.message || error}`)
@@ -553,7 +552,7 @@ function App() {
       <div className="space-y-4 md:space-y-6 px-2 md:px-4">
         {/* Status de Salvamento e Email */}
         {(saveStatus || isSaving || emailStatus.enviando) && (
-          <div className="max-w-6xl mx-auto space-y-3 print-hide">
+          <div className="max-w-6xl mx-auto space-y-3">
             {/* Status de Salvamento */}
             <div className={`p-3 md:p-4 rounded-lg border text-sm md:text-base ${
               saveStatus === 'success' 
@@ -643,7 +642,7 @@ function App() {
           </div>
         )}
 
-        <div ref={resultadosRef} id="print-area" className="w-full max-w-6xl mx-auto bg-white print-area">
+        <div ref={resultadosRef} id="print-area" className="w-full max-w-6xl mx-auto bg-white">
           <Card className="border-0 shadow-lg md:shadow-2xl">
             <CardHeader className="text-center bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-t-lg p-4 md:p-6 print-header">
               <div className="mx-auto w-16 h-16 md:w-20 md:h-20 bg-white/20 rounded-full flex items-center justify-center mb-3 md:mb-4">
@@ -762,7 +761,7 @@ function App() {
         </div>
 
         {/* Botões de Ação */}
-        <div className="flex flex-col gap-3 md:gap-4 justify-center max-w-6xl mx-auto px-4 print-hide">
+        <div className="flex flex-col gap-3 md:gap-4 justify-center max-w-6xl mx-auto px-4">
           <Button
             onClick={() => window.print()}
             variant="outline"
@@ -819,7 +818,7 @@ function App() {
     ]
 
     return (
-      <div id="print-area" ref={explicacoesRef} className="space-y-6 md:space-y-8 px-2 md:px-4">
+      <div id="print-area" className="space-y-6 md:space-y-8 px-2 md:px-4">
         <Card className="w-full max-w-4xl mx-auto">
           <CardHeader className="text-center bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-t-lg p-6 print-header">
             <div className="mx-auto w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-3">
@@ -832,7 +831,7 @@ function App() {
           </CardHeader>
 
           <CardContent className="p-4 md:p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 print-gray">
               {nomesOrdenados.map(({ nome }) => {
                 const desc = mapaDescricoes.get(nome) || 'Descrição em breve.'
                 const isTop = top3Nomes.includes(nome)
@@ -872,7 +871,7 @@ function App() {
 
 
   return (
-    <div id="app-root" className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-4 md:py-8 px-2 md:px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-4 md:py-8 px-2 md:px-4">
       <div className="container mx-auto">
         {/* Barra de Progresso */}
         {currentStep > 0 && currentStep < totalSteps && (
@@ -896,6 +895,5 @@ function App() {
     </div>
   )
 }
-
 
 export default App
