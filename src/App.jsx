@@ -13,14 +13,23 @@ import { enviarEmailUsuario, enviarEmailSecretaria, validarConfiguracaoEmail } f
 import dadosFormulario from './assets/dados_formulario.json'
 import './App.css'
 
+const params = new URLSearchParams(window.location.search)
+const DEV = params.has('dev')               // ?dev ativa o modo
+const STEP_OVERRIDE = Number(params.get('step') || NaN) // ?step=9 por ex.
+const EMAIL_ON = params.get('email') !== 'false'        // ?email=false p/ não enviar e-mail
+
 function App() {
-  const [currentStep, setCurrentStep] = useState(0) // 0 = início, 1-7 = testes, 8 = aviso, 9 = resultados
-  const [formData, setFormData] = useState({
-    nome: '',
-    igreja: '',
-    email: '', // Novo campo para email do usuário
-    respostas: {} // {perguntaId: pontuacao}
-  })
+  const [currentStep, setCurrentStep] = useState(
+    Number.isFinite(STEP_OVERRIDE) ? STEP_OVERRIDE : 0
+  )
+
+  const [formData, setFormData] = useState(() => ({
+    nome: DEV ? 'Teste Rápido' : '',
+    igreja: DEV ? 'OBPC Cafelândia' : '',
+    email: DEV ? 'dev@example.com' : '',
+    respostas: {}
+  }))
+
   const [isExporting, setIsExporting] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [saveStatus, setSaveStatus] = useState(null) // 'success', 'error', null
