@@ -644,7 +644,7 @@ function App() {
 
         <div ref={resultadosRef} id="print-area" className="w-full max-w-6xl mx-auto bg-white">
           <Card className="border-0 shadow-lg md:shadow-2xl">
-            <CardHeader className="text-center bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-t-lg p-4 md:p-6">
+            <CardHeader className="text-center bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-t-lg p-4 md:p-6 print-header">
               <div className="mx-auto w-16 h-16 md:w-20 md:h-20 bg-white/20 rounded-full flex items-center justify-center mb-3 md:mb-4">
                 <BarChart3 className="h-8 w-8 md:h-10 md:w-10" />
               </div>
@@ -665,7 +665,7 @@ function App() {
                   {top3.map((dom, index) => (
                     <div 
                       key={dom.nome}
-                      className={`relative text-center p-6 md:p-8 rounded-xl shadow-lg bg-gradient-to-br ${getColorForPosition(index)} text-white transform hover:scale-105 transition-transform`}
+                      className={`relative text-center p-6 md:p-8 rounded-xl shadow-lg bg-gradient-to-br ${getColorForPosition(index)} text-white transform hover:scale-105 transition-transform print-top3-card`}
                     >
                       <div className="absolute -top-3 md:-top-4 left-1/2 transform -translate-x-1/2">
                         <div className="bg-white rounded-full p-2 md:p-3 shadow-lg">
@@ -696,8 +696,7 @@ function App() {
                 </h3>
                 <div className="space-y-3 md:space-y-4">
                   {resultados.map((dom, index) => (
-                    <div key={dom.nome} className="flex items-center justify-between p-3 md:p-6 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                      <div className="flex items-center gap-2 md:gap-4 flex-1 min-w-0">
+                    <div key={dom.nome} className="flex items-center justify-between p-3 md:p-6 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg shadow-sm hover:shadow-md transition-shadow print-gray">                      <div className="flex items-center gap-2 md:gap-4 flex-1 min-w-0">
                         <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-white text-sm md:text-base ${
                           index < 3 ? 'bg-gradient-to-r from-blue-500 to-purple-600' : 'bg-gray-400'
                         }`}>
