@@ -26,7 +26,7 @@ function App() {
   const [formData, setFormData] = useState(() => ({
     nome: DEV ? 'Teste Rápido' : '',
     igreja: DEV ? 'OBPC Cafelândia' : '',
-    email: DEV ? 'dev@example.com' : '',
+    email: DEV ? 'dev' : '',
     respostas: {}
   }))
 
@@ -552,7 +552,7 @@ function App() {
       <div className="space-y-4 md:space-y-6 px-2 md:px-4">
         {/* Status de Salvamento e Email */}
         {(saveStatus || isSaving || emailStatus.enviando) && (
-          <div className="max-w-6xl mx-auto space-y-3">
+          <div className="max-w-6xl mx-auto space-y-3 print-hide">
             {/* Status de Salvamento */}
             <div className={`p-3 md:p-4 rounded-lg border text-sm md:text-base ${
               saveStatus === 'success' 
@@ -761,7 +761,7 @@ function App() {
         </div>
 
         {/* Botões de Ação */}
-        <div className="flex flex-col gap-3 md:gap-4 justify-center max-w-6xl mx-auto px-4">
+        <div className="flex flex-col gap-3 md:gap-4 justify-center max-w-6xl mx-auto px-4 print-hide">
           <Button
             onClick={() => window.print()}
             variant="outline"
@@ -831,7 +831,7 @@ function App() {
           </CardHeader>
 
           <CardContent className="p-4 md:p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 print-gray">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               {nomesOrdenados.map(({ nome }) => {
                 const desc = mapaDescricoes.get(nome) || 'Descrição em breve.'
                 const isTop = top3Nomes.includes(nome)
