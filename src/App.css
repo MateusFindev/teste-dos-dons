@@ -122,34 +122,50 @@
 @media print {
   @page { size: A4 portrait; margin: 12mm; }
 
+  /* Fundo da página branco e manter cores */
   html, body {
     background: #ffffff !important;
     -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
   }
 
-  /* Esconde toda a UI */
+  /* Imprimir só a área de resultados */
   body * { visibility: hidden !important; }
-
-  /* Mostra só a área dos resultados */
-  #print-area, #print-area * {
-    visibility: visible !important;
-  }
+  #print-area, #print-area * { visibility: visible !important; }
   #print-area {
     position: relative !important;
     left: 0 !important;
     top: 0 !important;
     width: 100% !important;
+    /* garante preservação de cores nesta área */
+    -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+    background: #ffffff !important; /* base branca sob os cards */
   }
 
-  /* Evitar quebras feias */
+  /* ===== Fallbacks de gradiente sem OKLCH (usa HEX do Tailwind) ===== */
+  /* Mantém o visual, sem forçar tudo para azul sólido */
+  .bg-gradient-to-r  { background-image: linear-gradient( 90deg, #3b82f6, #7c3aed) !important; }
+  .bg-gradient-to-l  { background-image: linear-gradient(270deg, #3b82f6, #7c3aed) !important; }
+  .bg-gradient-to-b  { background-image: linear-gradient(180deg, #3b82f6, #7c3aed) !important; }
+  .bg-gradient-to-t  { background-image: linear-gradient(  0deg, #3b82f6, #7c3aed) !important; }
+  .bg-gradient-to-tr { background-image: linear-gradient( 45deg, #3b82f6, #7c3aed) !important; }
+  .bg-gradient-to-tl { background-image: linear-gradient(315deg, #3b82f6, #7c3aed) !important; }
+  .bg-gradient-to-br { background-image: linear-gradient(135deg, #3b82f6, #7c3aed) !important; }
+  .bg-gradient-to-bl { background-image: linear-gradient(225deg, #3b82f6, #7c3aed) !important; }
+
+  /* Garante que cards e textos mantenham contraste correto */
+  .bg-white { background-color: #ffffff !important; }
+  .text-white { color: #ffffff !important; }
+
+  /* Barras de progresso e superfícies neutras */
+  .bg-gray-200 { background-color: #e5e7eb !important; }
+  .from-blue-500, .to-purple-600 { /* se aparecerem isoladas, evita “tinta” estranha */
+    background-image: none !important;
+  }
+
+  /* Quebras mais bonitas */
   .avoid-break-inside { break-inside: avoid; page-break-inside: avoid; }
-  .page-break { break-before: page; page-break-before: always; }
-
-  /* Gradientes simplificados para impressão */
-  .bg-gradient-to-r, .bg-gradient-to-l, .bg-gradient-to-t, .bg-gradient-to-b,
-  .bg-gradient-to-tr, .bg-gradient-to-tl, .bg-gradient-to-br, .bg-gradient-to-bl {
-    background: #4f46e5 !important; /* cor sólida bonita na impressão */
-  }
+  .page-break         { break-before: page; page-break-before: always; }
 }
 
