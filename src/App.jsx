@@ -7,7 +7,6 @@ import { Progress } from '@/components/ui/progress.jsx'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.jsx'
 import { ChevronLeft, ChevronRight, Users, Download, BarChart3, Trophy, Medal, Award, AlertCircle, Check, Mail, MailCheck, BookOpen } from 'lucide-react'
 import explicacoesDons from './assets/explicacoes_dons'
-import html2pdf from 'html2pdf.js'
 import { salvarResultado } from './lib/firebaseService'
 import { enviarEmailUsuario, enviarEmailSecretaria, validarConfiguracaoEmail } from './lib/emailService'
 import dadosFormulario from './assets/dados_formulario.json'
@@ -289,7 +288,6 @@ function App() {
         pagebreak: { mode: ['css', 'legacy'] }
       }
 
-      await html2pdf().set(options).from(clone).save()
     } catch (error) {
       console.error('Erro ao gerar PDF:', error)
       alert(`Erro ao gerar PDF: ${error?.message || error}`)
@@ -645,7 +643,7 @@ function App() {
           </div>
         )}
 
-        <div ref={resultadosRef} id="print-area" className="w-full max-w-6xl mx-auto bg-white">
+        <div ref={resultadosRef} id="print-area" className="w-full max-w-6xl mx-auto bg-white print-area">
           <Card className="border-0 shadow-lg md:shadow-2xl">
             <CardHeader className="text-center bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-t-lg p-4 md:p-6 print-header">
               <div className="mx-auto w-16 h-16 md:w-20 md:h-20 bg-white/20 rounded-full flex items-center justify-center mb-3 md:mb-4">
