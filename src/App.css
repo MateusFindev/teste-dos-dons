@@ -126,61 +126,70 @@
     background: #ffffff !important;
     -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
-  /* imprime só a área ativa */
+  /* Esconde tudo... */
   body * { visibility: hidden !important; }
+
+  /* ...menos a área que vamos imprimir */
   #print-area, #print-area * { visibility: visible !important; }
+
+  /* Põe a área de impressão no topo absoluto, sem ocupar espaço dos irmãos */
   #print-area {
-    position: relative !important;
-    left: 0 !important;
+    position: fixed !important;
     top: 0 !important;
+    left: 0 !important;
     width: 100% !important;
+    margin: 0 !important;
+    padding-top: 0 !important;
+    background: #ffffff !important;
   }
 
-  /* ===== CORES NA IMPRESSÃO ===== */
+  /* Zera qualquer espaçamento inicial do primeiro filho */
+  #print-area > *:first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
 
-  /* Cabeçalho e Top 3: azul sólido, texto branco */
+  /* Some com blocos marcados para não imprimir (status, botões, etc.) */
+  #print-area .print-hide {
+    display: none !important;
+  }
+
+  /* === CORES E LEGIBILIDADE (iguais ao que você pediu) === */
+
+  /* Cabeçalho e Top 3 em azul sólido */
   #print-area .print-header,
   #print-area .print-top3-card {
     background-image: none !important;
     background-color: #2563eb !important; /* blue-600 */
     color: #ffffff !important;
   }
-  #print-area .print-header .text-white,
-  #print-area .print-top3-card .text-white {
-    color: #ffffff !important;
-  }
 
-  /* Lista completa (cartões): cinza médio com borda, texto escuro */
+  /* Cartões da lista em cinza médio + borda, com texto escuro */
   #print-area .print-gray {
     background-image: none !important;
-    background-color: #e5e7eb !important; /* gray-200 (mais escuro que o gray-100) */
+    background-color: #e5e7eb !important; /* gray-200 */
     border-color: #cbd5e1 !important;     /* slate-300 */
     color: #111111 !important;
   }
 
-  /* Barras de progresso: trilha cinza + preenchimento azul forte */
-  #print-area .print-progress-track {
-    background-color: #d1d5db !important; /* gray-300 */
-  }
-  #print-area .print-progress {
-    background-image: none !important;
-    background-color: #1d4ed8 !important; /* blue-700 (destaca no cinza) */
-  }
-
-  /* Evita sombras lavadas e garante contraste de textos */
+  /* Barras de progresso legíveis no papel */
+  #print-area .print-progress-track  { background-color: #d1d5db !important; } /* gray-300 */
+  #print-area .print-progress        { background-color: #1d4ed8 !important; } /* blue-700 */
+  
+  /* Limpa sombras (na impressão ficam feias) */
   #print-area .shadow, #print-area .shadow-sm, #print-area .shadow-md,
   #print-area .shadow-lg, #print-area .shadow-xl, #print-area .shadow-2xl {
     box-shadow: none !important;
   }
-  #print-area .text-gray-800, #print-area .text-gray-700, #print-area .text-gray-600 {
-    color: #111111 !important;
-  }
 
-  /* Quebras de página */
+  /* Quebras de página opcionais */
   .avoid-break-inside { break-inside: avoid; page-break-inside: avoid; }
   .page-break { break-before: page; page-break-before: always; }
 }
+
 
 
