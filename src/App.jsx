@@ -42,9 +42,9 @@ function App() {
   const resultadosRef = useRef(null)
 
   const ORGANIZACOES_ENVIO = new Map([
-    ['AEAV', 'aeav@aeav.com.br'],
+    ['AEAV', null],
     ['Paranáfrigor', 'joaquim@paranafrigor.com.br'],
-    ['OBPC Cascavel - São Cristóvão', 'administrativo@obpccascavel.com.br'],
+    ['OBPC Cascavel - São Cristóvão', null],
     ['OBPC Cafelândia', 'ti@obpccafelandia.org'],
     ['Sem organização', null]
   ])
