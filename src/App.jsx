@@ -9,14 +9,14 @@ import { ChevronLeft, ChevronRight, Users, Download, BarChart3, Trophy, Medal, A
 import explicacoesDons from './assets/explicacoes_dons'
 import html2pdf from 'html2pdf.js'
 import { salvarResultado } from './lib/firebaseService'
-import { enviarEmailUsuario, enviarEmailSecretaria, validarConfiguracaoEmail } from './lib/emailService'
+import { enviarEmailUsuario, enviarEmailSecretaria } from './lib/emailService'
 import dadosFormulario from './assets/dados_formulario.json'
 import './App.css'
 
 const params = new URLSearchParams(window.location.search)
-const DEV = params.has('dev')               // ?dev ativa o modo
-const STEP_OVERRIDE = Number(params.get('step') || NaN) // ?step=9 por ex.
-const EMAIL_ON = params.get('email') !== 'false'        // ?email=false p/ não enviar e-mail
+const DEV = params.has('dev')
+const STEP_OVERRIDE = Number(params.get('step') || NaN)
+const EMAIL_ON = params.get('email') !== 'false'
 
 function App() {
   const [currentStep, setCurrentStep] = useState(
@@ -25,7 +25,7 @@ function App() {
 
   const [formData, setFormData] = useState(() => ({
     nome: DEV ? 'Teste Rápido' : '',
-    igreja: DEV ? 'OBPC Cafelândia' : '',
+    igreja: DEV ? 'AEAV' : '',
     email: DEV ? 'dev@example.com' : '',
     respostas: {}
   }))
@@ -36,100 +36,58 @@ function App() {
   const [autoSaved, setAutoSaved] = useState(false)
   const [emailStatus, setEmailStatus] = useState({
     enviando: false,
-    secretaria: null, // 'success', 'error', null
-    usuario: null // 'success', 'error', null
+    secretaria: null, // 'success' | 'error' | 'not_configured' | 'skipped'
+    usuario: null     // 'success' | 'error' | 'not_configured' | 'skipped'
   })
   const resultadosRef = useRef(null)
-  const IGREJAS_COM_AVISO = new Set(['OBPC Cafelândia'])
+
+  const ORGANIZACOES_ENVIO = new Map([
+    ['AEAV', 'aeav@aeav.com.br'],
+    ['Paranáfrigor', 'joaquim@paranafrigor.com.br'],
+    ['OBPC Cascavel - São Cristóvão', 'administrativo@obpccascavel.com.br'],
+    ['OBPC Cafelândia', 'ti@obpccafelandia.org'],
+    ['Sem organização', null]
+  ])
+  const deveEnviarParaCoordenacao = (org) => Boolean(ORGANIZACOES_ENVIO.get(org))
 
   const MAPA_SINONIMOS = {
-  'Encorajamento': 'Encorajamento (ou Exortação)',
-  'Oração': 'Oração (ou Intercessão)',
-  'Serviço Prático': 'Serviço'
-}
+    'Encorajamento': 'Encorajamento (ou Exortação)',
+    'Oração': 'Oração (ou Intercessão)',
+    'Serviço Prático': 'Serviço'
+  }
 
-  const totalSteps = 9 // início + 7 testes + resultados
+  const totalSteps = 9
   const progressPercentage = (currentStep / totalSteps) * 100
 
-  // Opções de resposta com tamanhos corrigidos: grande → média → pequena → média → grande
   const opcoesResposta = [
-    { 
-      label: 'Discordo Plenamente', 
-      pontuacao: 0, 
-      cor: 'border-blue-400', 
-      corPreenchida: 'bg-blue-400 border-blue-400',
-      tamanho: 'w-10 h-10 md:w-12 md:h-12' // GRANDE
-    },
-    { 
-      label: 'Discordo', 
-      pontuacao: 10, 
-      cor: 'border-blue-400', 
-      corPreenchida: 'bg-blue-400 border-blue-400',
-      tamanho: 'w-8 h-8 md:w-10 md:h-10' // MÉDIA
-    },
-    { 
-      label: 'Neutro', 
-      pontuacao: 20, 
-      cor: 'border-gray-400', 
-      corPreenchida: 'bg-gray-400 border-gray-400',
-      tamanho: 'w-6 h-6 md:w-8 md:h-8' // PEQUENA
-    },
-    { 
-      label: 'Concordo', 
-      pontuacao: 30, 
-      cor: 'border-green-500', 
-      corPreenchida: 'bg-green-500 border-green-500',
-      tamanho: 'w-8 h-8 md:w-10 md:h-10' // MÉDIA
-    },
-    { 
-      label: 'Concordo Plenamente', 
-      pontuacao: 40, 
-      cor: 'border-green-500', 
-      corPreenchida: 'bg-green-500 border-green-500',
-      tamanho: 'w-10 h-10 md:w-12 md:h-12' // GRANDE
-    }
+    { label: 'Discordo Plenamente', pontuacao: 0,  cor: 'border-blue-400', corPreenchida: 'bg-blue-400 border-blue-400', tamanho: 'w-10 h-10 md:w-12 md:h-12' },
+    { label: 'Discordo',            pontuacao: 10, cor: 'border-blue-400', corPreenchida: 'bg-blue-400 border-blue-400', tamanho: 'w-8  h-8  md:w-10 md:h-10' },
+    { label: 'Neutro',              pontuacao: 20, cor: 'border-gray-400', corPreenchida: 'bg-gray-400 border-gray-400', tamanho: 'w-6  h-6  md:w-8  md:h-8'  },
+    { label: 'Concordo',            pontuacao: 30, cor: 'border-green-500',corPreenchida: 'bg-green-500 border-green-500', tamanho: 'w-8  h-8  md:w-10 md:h-10' },
+    { label: 'Concordo Plenamente', pontuacao: 40, cor: 'border-green-500',corPreenchida: 'bg-green-500 border-green-500', tamanho: 'w-10 h-10 md:w-12 md:h-12' }
   ]
 
-  // Scroll para o topo quando muda de seção
   useEffect(() => {
-    if (currentStep > 0) {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    }
+    if (currentStep > 0) window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [currentStep])
 
-  // Auto-salvar e enviar emails quando chega nos resultados
   useEffect(() => {
-    if (currentStep === 9 && !autoSaved) {
-      salvarAutomaticamenteEEnviarEmails()
-    }
+    if (currentStep === 9 && !autoSaved) salvarAutomaticamenteEEnviarEmails()
   }, [currentStep, autoSaved])
 
   const handleNext = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1)
-    }
+    if (currentStep < totalSteps) setCurrentStep(currentStep + 1)
   }
-
   const handlePrevious = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1)
-    }
+    if (currentStep > 0) setCurrentStep(currentStep - 1)
   }
-
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }))
+    setFormData(prev => ({ ...prev, [field]: value }))
   }
-
   const handleAnswerChange = (perguntaId, pontuacao) => {
     setFormData(prev => ({
       ...prev,
-      respostas: {
-        ...prev.respostas,
-        [perguntaId]: pontuacao
-      }
+      respostas: { ...prev.respostas, [perguntaId]: pontuacao }
     }))
   }
 
@@ -138,77 +96,76 @@ function App() {
       const pontuacaoTotal = dom.perguntas.reduce((total, perguntaId) => {
         return total + (formData.respostas[perguntaId] || 0)
       }, 0)
-      
+
       return {
         nome: dom.nome,
         pontuacao: pontuacaoTotal,
-        percentual: Math.round((pontuacaoTotal / 280) * 100) // 280 = pontuação máxima (7 perguntas * 40 pontos)
+        percentual: Math.round((pontuacaoTotal / 280) * 100)
       }
     })
 
-    // Ordenar por pontuação (maior para menor)
     return resultados.sort((a, b) => b.pontuacao - a.pontuacao)
   }
 
   const salvarAutomaticamenteEEnviarEmails = async () => {
     if (autoSaved) return
-
     setIsSaving(true)
     setSaveStatus(null)
     setEmailStatus({ enviando: true, secretaria: null, usuario: null })
 
     try {
       const resultados = calcularResultados()
-
-      // 1) Salva no Firebase
-      await salvarResultado(formData, resultados)
+      const docId = await salvarResultado(formData, resultados)
+      console.log('Resultado salvo com ID:', docId)
       setSaveStatus('success')
       setAutoSaved(true)
 
-      // 2) Envia e-mails SEM depender do "validarConfiguracaoEmail"
-      const deveEnviarSecretaria = IGREJAS_COM_AVISO.has(formData.igreja)
+      if (!EMAIL_ON) {
+        setEmailStatus({ enviando: false, secretaria: 'skipped', usuario: 'skipped' })
+        setIsSaving(false)
+        return
+      }
 
-      // envia secretaria (se aplicável)
-      let resSecretaria = { success: true, skipped: true }
-      if (deveEnviarSecretaria) {
-        resSecretaria = await enviarEmailSecretaria(formData, resultados)
-        // rate limit: 1 req/seg → pequena pausa antes do e-mail do usuário
+      const destinoOrg = ORGANIZACOES_ENVIO.get(formData.igreja)
+      const deveEnviarCoordenacao = Boolean(destinoOrg)
+
+      let resCoordenacao = { success: true, skipped: true }
+      if (deveEnviarCoordenacao) {
+        resCoordenacao = await enviarEmailSecretaria(formData, resultados, destinoOrg)
+        console.log('[EMAIL] coordenação ->', destinoOrg, resCoordenacao)
         await new Promise(r => setTimeout(r, 1200))
       }
 
-      // envia usuário (se e-mail informado, sua service já trata caso vazio)
       const resUsuario = await enviarEmailUsuario(formData, resultados)
+      console.log('[EMAIL] usuário ->', formData.email, resUsuario)
+
+      const normalize = (r) => {
+        if (r?.success) return 'success'
+        if (r?.error === 'not_configured') return 'not_configured'
+        if (r?.error === 'invalid_public_key') return 'error'
+        return 'error'
+      }
 
       setEmailStatus({
         enviando: false,
-        secretaria: deveEnviarSecretaria
-          ? (resSecretaria.success ? 'success' : 'error')
-          : 'skipped',
-        usuario: resUsuario.success ? 'success' : 'error'
+        secretaria: deveEnviarCoordenacao ? normalize(resCoordenacao) : 'skipped',
+        usuario: formData.email ? normalize(resUsuario) : 'skipped'
       })
-
     } catch (error) {
       console.error('Erro ao salvar/enviar:', error)
       setSaveStatus('error')
-      setEmailStatus({
-        enviando: false,
-        secretaria: 'error',
-        usuario: 'error'
-      })
+      setEmailStatus({ enviando: false, secretaria: 'error', usuario: 'error' })
     } finally {
       setIsSaving(false)
     }
   }
 
-
   const sanitizarCores = (root) => {
     const hasOKLCH = (v) => typeof v === 'string' && v.includes('oklch(')
-    const setSafe = (el, prop, val) => { try { el.style[prop] = val } catch { /* ignore */ } }
+    const setSafe = (el, prop, val) => { try { el.style[prop] = val } catch {} }
 
     const processEl = (el) => {
       const cs = getComputedStyle(el)
-
-      // background / gradient
       if (hasOKLCH(cs.backgroundImage) || hasOKLCH(cs.background)) {
         setSafe(el, 'backgroundImage', 'none')
         if (hasOKLCH(cs.backgroundColor)) {
@@ -218,23 +175,16 @@ function App() {
         }
       }
       if (hasOKLCH(cs.backgroundColor)) setSafe(el, 'backgroundColor', '#ffffff')
-
-      // texto
       if (hasOKLCH(cs.color)) setSafe(el, 'color', '#111111')
-
-      // bordas
       ;['borderTopColor','borderRightColor','borderBottomColor','borderLeftColor'].forEach((p) => {
         if (hasOKLCH(cs[p])) setSafe(el, p, '#e5e7eb')
       })
     }
 
-    // aplica no root e filhos
     processEl(root)
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT)
     let node
     while ((node = walker.nextNode())) processEl(node)
-
-    // força um gradiente seguro onde você usa bg-gradient-to-r
     root.querySelectorAll('.bg-gradient-to-r').forEach((el) => {
       el.style.backgroundImage = 'linear-gradient(90deg, #4f46e5, #8b5cf6)'
     })
@@ -254,14 +204,12 @@ function App() {
     Object.assign(clone.style, {
       background: '#ffffff',
       padding: '24px',
-      width: '794px',        // ~A4 @96dpi
+      width: '794px',
       maxWidth: '794px',
       boxShadow: 'none'
     })
 
     document.body.appendChild(clone)
-
-    // <<< solução do erro oklch
     sanitizarCores(clone)
 
     try {
@@ -332,14 +280,17 @@ function App() {
           </div>
           
           <div>
-            <Label htmlFor="igreja">Igreja *</Label>
+            <Label htmlFor="organizacao">Organização *</Label>
             <Select value={formData.igreja} onValueChange={(value) => handleInputChange('igreja', value)}>
-              <SelectTrigger className="mt-1">
-                <SelectValue placeholder="Selecione sua igreja" />
+              <SelectTrigger className="mt-1" id="organizacao">
+                <SelectValue placeholder="Selecione sua organização" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="OBPC Cascavel - São Cristóvão">OBPC Cascavel - São Cristóvão</SelectItem>
                 <SelectItem value="OBPC Cafelândia">OBPC Cafelândia</SelectItem>
+                <SelectItem value="AEAV">AEAV</SelectItem>
+                <SelectItem value="Paranáfrigor">Paranáfrigor</SelectItem>
+                <SelectItem value="Sem organização">Sem organização</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -360,20 +311,19 @@ function App() {
           </div>
         </div>
 
-        {IGREJAS_COM_AVISO.has(formData.igreja) && (
+        {deveEnviarParaCoordenacao(formData.igreja) && (
           <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
             <h3 className="font-semibold text-green-900 mb-2 flex items-center gap-2">
               <Mail className="h-4 w-4" />
               Envio Automático de Resultados
             </h3>
             <p className="text-green-800 text-sm">
-              Os resultados serão enviados automaticamente para a secretaria da sua igreja 
-              e para seu email (se informado) ao final do teste.
+              Os resultados serão enviados automaticamente para a <strong>coordenação da organização</strong> 
+              e para seu e-mail (se informado) ao final do teste.
             </p>
           </div>
         )}
 
-        
         <Button 
           onClick={handleNext}
           disabled={!formData.nome.trim() || !formData.igreja.trim()}
@@ -410,18 +360,11 @@ function App() {
         </div>
         
         <div className="flex flex-col sm:flex-row gap-3">
-          <Button 
-            variant="outline" 
-            onClick={handlePrevious}
-            className="flex-1 w-full"
-          >
+          <Button variant="outline" onClick={handlePrevious} className="flex-1 w-full">
             <ChevronLeft className="mr-2 h-4 w-4" />
             Voltar
           </Button>
-          <Button 
-            onClick={handleNext}
-            className="flex-1 w-full"
-          >
+          <Button onClick={handleNext} className="flex-1 w-full">
             Estou pronto(a) para continuar
             <ChevronRight className="ml-2 h-4 w-4" />
           </Button>
@@ -468,19 +411,14 @@ function App() {
                     <span className="text-primary font-bold">{perguntaId}.</span> {pergunta}
                   </p>
                   
-                  {/* Escala visual com bolinhas outline - tamanhos: grande → média → pequena → média → grande */}
                   <div className="flex flex-col space-y-4">
-                    {/* Labels */}
                     <div className="flex justify-between items-center text-sm font-medium text-gray-500">
                       <span>Discordo</span>
                       <span>Concordo</span>
                     </div>
-                    
-                    {/* Bolinhas com tamanhos: GRANDE → MÉDIA → PEQUENA → MÉDIA → GRANDE */}
                     <div className="flex justify-between items-center px-2">
                       {opcoesResposta.map((opcao, opcaoIndex) => {
                         const isSelected = respostaSelecionada === opcao.pontuacao
-                        
                         return (
                           <button
                             key={opcaoIndex}
@@ -504,19 +442,11 @@ function App() {
           </div>
           
           <div className="flex gap-3 mt-8">
-            <Button 
-              variant="outline" 
-              onClick={handlePrevious}
-              className="flex-1"
-            >
+            <Button variant="outline" onClick={handlePrevious} className="flex-1">
               <ChevronLeft className="mr-2 h-4 w-4" />
               Voltar
             </Button>
-            <Button 
-              onClick={handleNext}
-              className="flex-1"
-              disabled={!isTesteCompleto}
-            >
+            <Button onClick={handleNext} className="flex-1" disabled={!isTesteCompleto}>
               {testeIndex === 7 ? 'Ver Resultados' : 'Próxima Seção'}
               <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
@@ -550,10 +480,8 @@ function App() {
     
     return (
       <div className="space-y-4 md:space-y-6 px-2 md:px-4">
-        {/* Status de Salvamento e Email */}
         {(saveStatus || isSaving || emailStatus.enviando) && (
           <div className="max-w-6xl mx-auto space-y-3 no-print">
-            {/* Status de Salvamento */}
             <div className={`p-3 md:p-4 rounded-lg border text-sm md:text-base ${
               saveStatus === 'success' 
                 ? 'bg-green-50 border-green-200 text-green-800' 
@@ -598,23 +526,26 @@ function App() {
                   </div>
                 ) : (
                   <div className="ml-6 space-y-1">
-                    {IGREJAS_COM_AVISO.has(formData.igreja) && (
-                    <div className="flex items-center gap-2">
-                      {emailStatus.secretaria === 'success' ? (
-                        <MailCheck className="h-3 w-3 text-green-600" />
-                      ) : emailStatus.secretaria === 'not_configured' ? (
-                        <AlertCircle className="h-3 w-3 text-orange-600" />
-                      ) : (
-                        <AlertCircle className="h-3 w-3 text-red-600" />
-                      )}
-                      <span className="text-xs">
-                        Secretaria da igreja: {
-                          emailStatus.secretaria === 'success' ? 'Enviado com sucesso' :
-                          emailStatus.secretaria === 'not_configured' ? 'Não enviado :(' :
-                          'Erro no envio'
-                        }
-                      </span>
-                    </div>
+                    {deveEnviarParaCoordenacao(formData.igreja) && (
+                      <div className="flex items-center gap-2">
+                        {emailStatus.secretaria === 'success' ? (
+                          <MailCheck className="h-3 w-3 text-green-600" />
+                        ) : emailStatus.secretaria === 'not_configured' ? (
+                          <AlertCircle className="h-3 w-3 text-orange-600" />
+                        ) : emailStatus.secretaria === 'skipped' ? (
+                          <AlertCircle className="h-3 w-3 text-gray-500" />
+                        ) : (
+                          <AlertCircle className="h-3 w-3 text-red-600" />
+                        )}
+                        <span className="text-xs">
+                          Coordenação da organização: {
+                            emailStatus.secretaria === 'success' ? 'Enviado com sucesso' :
+                            emailStatus.secretaria === 'not_configured' ? 'Não enviado :(' :
+                            emailStatus.secretaria === 'skipped' ? 'Não aplicável' :
+                            'Erro no envio'
+                          }
+                        </span>
+                      </div>
                     )}
                     
                     {formData.email && (
@@ -697,7 +628,7 @@ function App() {
                 <div className="space-y-3 md:space-y-4">
                   {resultados.map((dom, index) => (
                     <div key={dom.nome} className="flex items-center justify-between p-3 md:p-6 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg shadow-sm hover:shadow-md transition-shadow print-gray">                      
-                    <div className="flex items-center gap-2 md:gap-4 flex-1 min-w-0">
+                      <div className="flex items-center gap-2 md:gap-4 flex-1 min-w-0">
                         <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-white text-sm md:text-base ${
                           index < 3 ? 'bg-gradient-to-r from-blue-500 to-purple-600' : 'bg-gray-400'
                         }`}>
@@ -732,7 +663,7 @@ function App() {
                     {formData.nome}
                   </div>
                   <div>
-                    <strong>Igreja:</strong><br />
+                    <strong>Organização:</strong><br />
                     {formData.igreja}
                   </div>
                   <div>
@@ -762,21 +693,12 @@ function App() {
 
         {/* Botões de Ação */}
         <div className="flex flex-col gap-3 md:gap-4 justify-center max-w-6xl mx-auto px-4">
-          <Button
-            onClick={() => window.print()}
-            variant="outline"
-            size="lg"
-            className="w-full md:max-w-xs md:mx-auto"
-          >
+          <Button onClick={() => window.print()} variant="outline" size="lg" className="w-full md:max-w-xs md:mx-auto">
             <Download className="mr-2 h-4 md:h-5 w-4 md:w-5" />
             Imprimir / Salvar como PDF
           </Button>
 
-          <Button 
-            onClick={() => setCurrentStep(10)}
-            size="lg"
-            className="w-full md:max-w-xs md:mx-auto"
-          >
+          <Button onClick={() => setCurrentStep(10)} size="lg" className="w-full md:max-w-xs md:mx-auto">
             <BookOpen className="mr-2 h-4 md:h-5 w-4 md:w-5" />
             Explicação de cada dom
           </Button>
@@ -801,20 +723,13 @@ function App() {
   }
 
   const renderExplicacoes = () => {
-    // recalcula resultados para destacar top 3
     const resultados = calcularResultados()
     const top3Nomes = resultados.slice(0, 3).map(d => MAPA_SINONIMOS[d.nome] || d.nome)
-
-    // cria um mapa nome->descricao a partir do JSON
     const mapaDescricoes = new Map(explicacoesDons.map(d => [d.nome, d.descricao]))
 
-    // ordena por: top3 primeiro (na ordem), depois alfabético
     const nomesOrdenados = [
-      ...explicacoesDons
-        .filter(d => top3Nomes.includes(d.nome)),
-      ...explicacoesDons
-        .filter(d => !top3Nomes.includes(d.nome))
-        .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
+      ...explicacoesDons.filter(d => top3Nomes.includes(d.nome)),
+      ...explicacoesDons.filter(d => !top3Nomes.includes(d.nome)).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
     ]
 
     return (
@@ -869,11 +784,9 @@ function App() {
     )
   }
 
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-4 md:py-8 px-2 md:px-4">
       <div className="container mx-auto">
-        {/* Barra de Progresso */}
         {currentStep > 0 && currentStep < totalSteps && (
           <div className="mb-6 md:mb-8 max-w-4xl mx-auto">
             <div className="flex justify-between text-sm text-muted-foreground mb-2">
@@ -884,7 +797,6 @@ function App() {
           </div>
         )}
 
-        {/* Renderização Condicional */}
         {currentStep === 0 && renderInicio()}
         {currentStep >= 1 && currentStep <= 6 && renderTeste(currentStep)}
         {currentStep === 7 && renderAviso()}

@@ -1,19 +1,36 @@
+// lib/emailService.js
+// Requer: npm i @emailjs/browser
+import * as EmailJS from '@emailjs/browser'
+
+/**
+ * CONFIG
+ * - Se definir VITE_EMAIL_BACKEND_URL, tentará enviar via backend.
+ * - Caso contrário, usa EmailJS direto no client.
+ * - Em DEV, se as chaves do EmailJS não estiverem configuradas, simula sucesso (mock).
+ */
+const EMAIL_BACKEND_URL = import.meta.env.VITE_EMAIL_BACKEND_URL || ''
+const IS_DEV = !!import.meta.env.DEV
+const FAKE_OK_DEV = (import.meta.env.VITE_EMAIL_FAKE_OK_DEV ?? 'true') === 'true'
 
 const EMAILJS_CONFIG = {
-  serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_teste_dons',
-  templateId: import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_resultado',
-  publicKey:  import.meta.env.VITE_EMAILJS_PUBLIC_KEY  || 'YOUR_PUBLIC_KEY'
+  serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID || '',
+  templateId: import.meta.env.VITE_EMAILJS_TEMPLATE_ID || '',
+  publicKey:  import.meta.env.VITE_EMAILJS_PUBLIC_KEY  || ''
 }
 
-const EMAIL_IGREJAS = {
+// Organização → e-mail da coordenação (null/undefined = não enviar)
+const EMAIL_ORGANIZACOES = {
+  AEAV: 'aeav@aeav.com.br',
+  Paranáfrigor: 'joaquim@paranafrigor.com.br',
   'OBPC Cascavel - São Cristóvão': 'administrativo@obpccascavel.com.br',
-  'OBPC Cafelândia': 'ti@obpccafelandia.org'
+  'OBPC Cafelândia': 'ti@obpccafelandia.org',
+  'Sem organização': null
 }
 
-// ===== helpers (iguais aos seus) =====
+// ===== helpers =====
 const formatarResultadosParaEmail = (formData, resultados) => {
   const top3 = (resultados || []).slice(0, 3)
-  const data  = new Date()
+  const data = new Date()
   const dataStr = data.toLocaleDateString('pt-BR')
   const horaStr = data.toLocaleTimeString('pt-BR')
 
@@ -22,7 +39,7 @@ const formatarResultadosParaEmail = (formData, resultados) => {
 
 PARTICIPANTE:
 Nome: ${formData.nome}
-Igreja: ${formData.igreja}
+Organização: ${formData.igreja}
 Email: ${formData.email || 'Não informado'}
 Data: ${dataStr} às ${horaStr}
 
@@ -59,7 +76,7 @@ const montarBlocosEmail = (resultados) => {
   const arr = Array.isArray(resultados) ? resultados : []
   const top3 = arr.slice(0, 3)
 
-  const safe = (v) => (v ?? '')
+  const safe = (v) => v ?? ''
   const t = (i) => top3[i] || {}
 
   const top = {
@@ -73,7 +90,7 @@ const montarBlocosEmail = (resultados) => {
 
     top3_nome: safe(t(2).nome),
     top3_pontos: safe(t(2).pontuacao ?? 0),
-    top3_percentual: safe(t(2).percentual ?? 0),
+    top3_percentual: safe(t(2).percentual ?? 0)
   }
 
   const linhas = arr
@@ -95,23 +112,23 @@ const montarBlocosEmail = (resultados) => {
     })
     .join('')
 
-  // Este objeto é o que vamos "espalhar" com ...blocos
   return { ...top, tabela_resultados_html: linhas }
 }
 
 const buildTemplateParams = (formData, resultados, opts = {}) => {
   const textoResultados = formatarResultadosParaEmail(formData, resultados)
-  const data  = new Date()
-  const blocos = montarBlocosEmail(resultados) // <- gera os campos do email estilizado
+  const data = new Date()
+  const blocos = montarBlocosEmail(resultados)
 
   return {
-    from_name: opts.from_name ?? `${formData.igreja} - Sistema Teste dos Dons`,
-    reply_to:  formData.email || 'nao-responder@exemplo.com',
-    message:   textoResultados,
+    from_name: opts.from_name ?? `${formData.igreja || 'Sem organização'} - Sistema Teste dos Dons`,
+    reply_to: formData.email || 'nao-responder@exemplo.com',
+    message: textoResultados,
     results_json: JSON.stringify(resultados || [], null, 2),
 
     participante_nome: formData.nome,
-    participante_igreja: formData.igreja,
+    participante_igreja: formData.igreja,            // compat com template atual
+    participante_organizacao: formData.igreja || '', // campo opcional, caso ajuste o template
     participante_email: formData.email || 'Não informado',
     data_teste: data.toLocaleDateString('pt-BR'),
     hora_teste: data.toLocaleTimeString('pt-BR'),
@@ -119,67 +136,105 @@ const buildTemplateParams = (formData, resultados, opts = {}) => {
     pontuacao_principal: resultados?.[0]?.pontuacao || 0,
 
     to_email: opts.to_email,
-    to_name:  opts.to_name,
-    subject:  opts.subject ?? `Resultado do Teste dos Dons - ${formData.nome}`,
+    to_name: opts.to_name,
+    subject: opts.subject ?? `Resultado do Teste dos Dons - ${formData.nome}`,
 
-    // Blocos para o HTML do template (top1/2/3 + tabela)
     ...blocos
   }
 }
 
-const enviarViaApi = async (templateParams) => {
-  const resp = await fetch('/api/emailjs/send', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ template_params: templateParams }) // <— aninhado
-  })
-  const data = await resp.json().catch(() => ({}))
-  if (!resp.ok || !data?.ok) {
-    throw new Error(data?.error || `Falha no envio (${resp.status})`)
+/**
+ * Estratégia de envio:
+ * 1) Se EMAIL_BACKEND_URL estiver definido -> envia via backend (server-side).
+ * 2) Senão, se chaves EmailJS estiverem definidas -> EmailJS no client.
+ * 3) Senão, em DEV e FAKE_OK_DEV=true -> MOCK (simula sucesso).
+ * 4) Caso contrário -> not_configured.
+ */
+const enviar = async (templateParams) => {
+  // 1) Backend (opcional)
+  if (EMAIL_BACKEND_URL) {
+    try {
+      const resp = await fetch(EMAIL_BACKEND_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ template_params: templateParams })
+      })
+      const data = await resp.json().catch(() => ({}))
+      if (resp.ok && (data?.ok || data?.success)) {
+        return { ok: true, provider: 'backend', data }
+      }
+      const e = data?.error || `Falha no envio (${resp.status})`
+      return { ok: false, error: e, detail: data }
+    } catch (e) {
+      // falhou o backend: segue o fluxo (EmailJS / Mock)
+      console.warn('[email] backend falhou, tentando EmailJS:', e?.message || e)
+    }
   }
-  return data
+
+  // 2) EmailJS no client
+  const { serviceId, templateId, publicKey } = EMAILJS_CONFIG
+  if (serviceId && templateId && publicKey) {
+    try {
+      const result = await EmailJS.send(serviceId, templateId, templateParams, { publicKey })
+      return { ok: true, provider: 'emailjs', result }
+    } catch (err) {
+      if (err?.status === 400 && /Public Key is invalid/i.test(err?.text || '')) {
+        return { ok: false, error: 'invalid_public_key', detail: err?.text }
+      }
+      return { ok: false, error: err?.message || 'unknown_error', detail: err }
+    }
+  }
+
+  // 3) Mock em DEV
+  if (IS_DEV && FAKE_OK_DEV) {
+    console.warn('[email] MOCK: chaves ausentes. Simulando envio com sucesso (dev).')
+    console.debug('[email] payload simulado:', templateParams)
+    return { ok: true, provider: 'mock', debug: 'no_keys_dev_mock' }
+  }
+
+  // 4) Não configurado
+  return { ok: false, error: 'not_configured' }
 }
 
 // ===== exports =====
-export const enviarEmailSecretaria = async (formData, resultados) => {
+export const enviarEmailSecretaria = async (formData, resultados, destinatarioOverride) => {
   try {
-    const emailSecretaria = EMAIL_IGREJAS[formData.igreja]
-    if (!emailSecretaria) throw new Error('Email da secretaria não encontrado para esta igreja')
+    const emailCoord = destinatarioOverride ?? EMAIL_ORGANIZACOES[formData.igreja]
+    if (!emailCoord) return { success: false, error: 'not_configured' }
 
     const params = buildTemplateParams(formData, resultados, {
-      to_email: emailSecretaria,
-      to_name: `Secretaria ${formData.igreja}`,
+      to_email: emailCoord,
+      to_name: `Coordenação ${formData.igreja}`,
       from_name: 'Sistema Teste dos Dons',
       subject: `Novo Teste dos Dons - ${formData.nome}`
     })
 
-    const response = await enviarViaApi(params)
-    console.log('Email enviado para secretaria:', response)
+    const response = await enviar(params)
+    if (!response?.ok) return { success: false, error: response?.error || 'send_failed', detail: response?.detail }
+
     return { success: true, response }
   } catch (error) {
-    console.error('Erro ao enviar email para secretaria:', error)
     return { success: false, error: error?.message || String(error) }
   }
 }
 
 export const enviarEmailUsuario = async (formData, resultados) => {
   try {
-    if (!formData.email || !formData.email.trim()) {
-      return { success: true, message: 'Email do usuário não fornecido' }
-    }
+    const to = (formData?.email || '').trim()
+    if (!to) return { success: false, error: 'not_configured' }
 
     const params = buildTemplateParams(formData, resultados, {
-      to_email: formData.email,
+      to_email: to,
       to_name: formData.nome,
-      from_name: `${formData.igreja} - Sistema Teste dos Dons`,
+      from_name: `${formData.igreja || 'Sem organização'} - Sistema Teste dos Dons`,
       subject: `Seus Resultados do Teste dos Dons - ${formData.nome}`
     })
 
-    const response = await enviarViaApi(params)
-    console.log('Email enviado para usuário:', response)
+    const response = await enviar(params)
+    if (!response?.ok) return { success: false, error: response?.error || 'send_failed', detail: response?.detail }
+
     return { success: true, response }
   } catch (error) {
-    console.error('Erro ao enviar email para usuário:', error)
     return { success: false, error: error?.message || String(error) }
   }
 }
@@ -187,27 +242,27 @@ export const enviarEmailUsuario = async (formData, resultados) => {
 export const enviarEmails = async (formData, resultados) => {
   const out = { secretaria: { success: false }, usuario: { success: false } }
   try {
-    // se a sua lógica enviar só para Cafelândia, verifique aqui antes
-    const enviarSecretaria = formData.igreja === 'OBPC Cafelândia'
+    const emailOrg = EMAIL_ORGANIZACOES[formData.igreja]
+    const enviarCoord = !!emailOrg
 
-    if (enviarSecretaria) {
-      out.secretaria = await enviarEmailSecretaria(formData, resultados)
-      // rate limit 1 req/seg: pequena pausa adicional por segurança
-      await new Promise(r => setTimeout(r, 1200))
+    if (enviarCoord) {
+      out.secretaria = await enviarEmailSecretaria(formData, resultados, emailOrg)
+      await new Promise(r => setTimeout(r, 1200)) // rate limit
     } else {
-      out.secretaria = { success: true, skipped: true }
+      out.secretaria = { success: false, error: 'not_configured', skipped: true }
     }
 
     out.usuario = await enviarEmailUsuario(formData, resultados)
     return out
   } catch (err) {
-    console.error('Erro geral no envio de emails:', err)
     return out
   }
 }
 
+// Informativo
 export const validarConfiguracaoEmail = () => ({
-  isConfigured: true,
-  message: 'Envio via API serverless habilitado'
+  backend: !!EMAIL_BACKEND_URL,
+  emailjsConfigured: !!(EMAILJS_CONFIG.serviceId && EMAILJS_CONFIG.templateId && EMAILJS_CONFIG.publicKey),
+  isDev: IS_DEV,
+  fakeOkDev: FAKE_OK_DEV
 })
-
