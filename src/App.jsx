@@ -784,6 +784,27 @@ function App() {
     )
   }
 
+  useEffect(() => {
+    const url = new URL(window.location.href)
+
+    // 1) Se quiser usar formato com query param: ?id=xxxx
+    const idFromQuery = url.searchParams.get("id")
+
+    // 2) Se quiser usar formato /xxxx (pega o primeiro segmento do pathname)
+    const pathSegs = url.pathname.split("/").filter(Boolean)
+    const idFromPath = pathSegs.length === 1 ? pathSegs[0] : null
+
+    const id = idFromQuery || idFromPath
+
+    if (id) {
+      ;(async () => {
+        console.log("[Envio automático] Tentando enviar resultado para ID:", id)
+        const res = await sendEmailById(id)
+        console.log("[Envio automático] Resultado:", res)
+      })()
+    }
+  }, [])
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-4 md:py-8 px-2 md:px-4">
       <div className="container mx-auto">
