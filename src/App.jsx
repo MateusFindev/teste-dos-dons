@@ -12,6 +12,7 @@ import { salvarResultado } from './lib/firebaseService'
 import { enviarEmailUsuario, enviarEmailSecretaria } from './lib/emailService'
 import dadosFormulario from './assets/dados_formulario.json'
 import './App.css'
+import { sendEmailById } from "./lib/sendEmailById";
 
 const params = new URLSearchParams(window.location.search)
 const DEV = params.has('dev')
