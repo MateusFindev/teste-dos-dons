@@ -1,19 +1,23 @@
-// src/pages/EnviarResultado.jsx
 import { useEffect, useState } from "react";
-import { autoSendFromUrlParam } from "@/lib/sendEmailById";
+import { sendEmailById } from "@/lib/sendEmailById"; // a função que te passei
 
 export default function EnviarResultado() {
   const [status, setStatus] = useState({ loading: true });
 
   useEffect(() => {
     (async () => {
-      const r = await autoSendFromUrlParam("id"); // pega ?id=...
+      const url = new URL(window.location.href);
+      const id = url.searchParams.get("id");
+      if (!id) {
+        setStatus({ loading: false, success: false, detail: "Query param 'id' ausente" });
+        return;
+      }
+      const r = await sendEmailById(id);
       setStatus({ loading: false, ...r });
     })();
   }, []);
 
   if (status.loading) return <p>Enviando e-mail...</p>;
   if (!status.success) return <p>Erro: {String(status.detail)}</p>;
-
-  return <p>E-mail enviado com sucesso! ✅</p>;
+  return <p>E-mail enviado com sucesso ✅</p>;
 }
