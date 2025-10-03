@@ -802,9 +802,18 @@ function App() {
         const res = await sendEmailById(id)
         console.log("[Envio automático] Resultado:", res)
       })()
+      ;(async () => {
+       try {
+         console.log("[Envio automático] ID detectado:", { id, idFromQuery, idFromPath, href: window.location.href })
+         const res = await sendEmailById(id)
+         console.log("[Envio automático] OK:", res)
+       } catch (err) {
+         console.error("[Envio automático] Falhou:", err)
+       }
+     })()
     }
   }, [])
-  
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-4 md:py-8 px-2 md:px-4">
       <div className="container mx-auto">
