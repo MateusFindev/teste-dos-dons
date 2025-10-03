@@ -787,25 +787,21 @@ function App() {
 
   useEffect(() => {
     const url = new URL(window.location.href);
-
     const idFromQuery = url.searchParams.get("id");
     const pathSegs = url.pathname.split("/").filter(Boolean);
     const idFromPath = pathSegs.length === 1 ? pathSegs[0] : null;
-
     const id = idFromQuery || idFromPath;
 
     if (id) {
       (async () => {
         try {
           console.log("[Envio automático] ID detectado:", { id, idFromQuery, idFromPath, href: window.location.href });
-          const res = await sendEmailById(id);
+          const res = await sendEmailById(id, { endpoint: "/api/send-email" }); // opcional: já é o default
           console.log("[Envio automático] OK:", res);
         } catch (err) {
           console.error("[Envio automático] Falhou:", err);
         }
       })();
-    } else {
-      console.log("[Envio automático] nenhum id encontrado na URL");
     }
   }, []);
 
