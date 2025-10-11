@@ -46,7 +46,7 @@ function App() {
     ['AEAV', 'rafaelgoncalves@aeav.org'],
     ['Paranáfrigor', 'joaquim@paranafrigor.com.br'],
     ['OBPC Cascavel - São Cristóvão', null],
-    ['OBPC Cafelândia', 'ti@obpccafelandia.org'],
+    ['OBPC Cafelândia', 'secretaria@obpccafelandia.org'],
     ['Sem organização', null]
   ])
   const deveEnviarParaCoordenacao = (org) => Boolean(ORGANIZACOES_ENVIO.get(org))
